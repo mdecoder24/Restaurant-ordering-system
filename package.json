@@ -1,5 +1,21 @@
 {
+  "name": "krudex",
+  "private": true,
+  "packageManager": "pnpm@12.15.0",
+  "engines": {
+    "node": ">=22"
+  },
+  "scripts": {
+    "dev": "pnpm --filter web dev",
+    "build": "pnpm -r build",
+    "lint": "pnpm -r lint && node scripts/check-raw-hex.mjs",
+    "typecheck": "pnpm -r typecheck",
+    "test": "pnpm -r test",
+    "e2e": "pnpm --filter web e2e",
+    "format": "prettier --write ."
+  },
   "devDependencies": {
+    "prettier": "^3",
     "supabase": "^3.1.0"
   }
 }
