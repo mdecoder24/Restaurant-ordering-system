@@ -50,9 +50,9 @@ export function QrTent({ className, label = "Table 7" }: { className?: string; l
   return (
     <div aria-hidden className={cn("tent-sway relative h-44 w-36 [transform-style:preserve-3d]", className)}>
       {/* Back panel */}
-      <div className="absolute inset-0 origin-top rounded-md border border-border-strong bg-surface-2 shadow-md [transform:rotateX(24deg)_translateZ(-1px)] [backface-visibility:hidden]" />
+      <div className="absolute inset-0 origin-top rounded-md border border-border-strong bg-surface-2 shadow-md [transform:rotateX(-24deg)_translateZ(-1px)]" />
       {/* Front panel */}
-      <div className="absolute inset-0 flex origin-top flex-col items-center rounded-md border border-border-strong bg-surface p-3 shadow-lg [transform:rotateX(-24deg)]">
+      <div className="absolute inset-0 flex origin-top flex-col items-center rounded-md border border-border-strong bg-surface p-3 shadow-lg [transform:rotateX(24deg)]">
         <div className="flex items-center gap-1.5">
           <LogoMark className="size-4" />
           <span className="text-[0.625rem] font-bold tracking-wide uppercase">Scan to order</span>

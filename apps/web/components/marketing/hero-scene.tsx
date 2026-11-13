@@ -22,7 +22,7 @@ const layer = (z: number, rx: number, ry: number, delay: number) =>
  */
 export function HeroScene() {
   return (
-    <div className="scene-enter relative h-[520px] w-[540px] max-w-none [zoom:0.62] min-[420px]:[zoom:0.72] sm:[zoom:0.9] lg:[zoom:0.92] xl:[zoom:1]">
+    <div className="scene-enter relative h-[520px] w-[560px] max-w-none [zoom:0.62] min-[420px]:[zoom:0.72] sm:[zoom:0.9] lg:[zoom:0.92] xl:[zoom:1]">
       {/* Floor glow under the scene */}
       <div
         aria-hidden
@@ -30,15 +30,15 @@ export function HeroScene() {
       />
       <Tilt track="window" max={7} className="absolute inset-0" innerClassName="size-full">
         <div className="absolute inset-0 [transform-style:preserve-3d] [transform:rotateX(8deg)_rotateY(-14deg)]">
-          <div className="scene-layer absolute top-4 left-2" style={layer(-90, 2, 14, 0)}>
+          <div className="scene-layer absolute top-6 left-0" style={layer(-110, 2, 16, 0)}>
             <PhoneMock />
           </div>
 
-          <div className="scene-layer absolute top-24 right-0 w-[330px]" style={layer(40, 0, -4, -1.6)}>
+          <div className="scene-layer absolute top-20 -right-2 w-[318px]" style={layer(40, 0, -4, -1.6)}>
             <LiveTicketDemo className="max-w-none" />
           </div>
 
-          <div className="scene-layer absolute bottom-6 left-[176px]" style={layer(120, 0, 10, -3.1)}>
+          <div className="scene-layer absolute bottom-2 left-[96px]" style={layer(130, 0, 10, -3.1)}>
             <QrTent />
           </div>
 
@@ -49,7 +49,7 @@ export function HeroScene() {
             </span>
           </div>
 
-          <div className="scene-layer absolute right-6 bottom-20" style={layer(190, 0, -8, -2.4)}>
+          <div className="scene-layer absolute right-4 bottom-12" style={layer(190, 0, -8, -2.4)}>
             <span className="flex items-center gap-2 rounded-pill bg-text px-3 py-2 text-small font-semibold text-bg shadow-lg">
               <BellRing aria-hidden className="size-4" strokeWidth={2.5} />
               Kitchen notified
