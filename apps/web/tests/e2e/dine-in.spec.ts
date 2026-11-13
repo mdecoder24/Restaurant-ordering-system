@@ -46,7 +46,7 @@ test.describe("full dine-in run-through (T14, T16)", () => {
     await page.waitForLoadState("networkidle");
     await page.getByRole("button", { name: /^Table T9, Occupied/ }).click();
     const sheet = page.getByRole("dialog");
-    await expect(sheet.getByText("₹294")).toBeVisible();
+    await expect(sheet.getByText("₹294").last()).toBeVisible();
     await sheet.getByRole("button", { name: "Record payment" }).click();
     await expect(page.getByText("₹294 recorded")).toBeVisible();
     await page.getByRole("dialog").getByRole("button", { name: "Close table" }).click();
