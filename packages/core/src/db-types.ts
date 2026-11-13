@@ -1155,6 +1155,7 @@ export type Database = {
           order_no: number;
         }[];
       };
+      rollup_all_outlets: { Args: { p_days_back: number }; Returns: undefined };
       rollup_daily_metrics: { Args: { p_day: string; p_outlet: string }; Returns: undefined };
       session_balance: {
         Args: { p_session: string };

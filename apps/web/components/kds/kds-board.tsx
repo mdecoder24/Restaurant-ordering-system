@@ -2,6 +2,7 @@
 
 import type { OrderStatus } from "@krudex/core/order-status";
 import { Check, ChefHat, Undo2, Volume2, VolumeX } from "lucide-react";
+import { useRouter } from "next/navigation";
 import { useCallback, useEffect, useMemo, useRef, useState } from "react";
 import { ConnectionBanner } from "@/components/ui/connection-banner";
 import { EmptyState } from "@/components/ui/empty-state";
@@ -141,6 +142,7 @@ export function KdsBoard({
   warnMin: number;
   overdueMin: number;
 }) {
+  const router = useRouter();
   const [orders, setOrders] = useState(initial);
   const [now, setNow] = useState(() => Date.now());
   const [muted, setMuted] = useState(false);
@@ -187,7 +189,7 @@ export function KdsBoard({
       const since = new Date(Date.now() - CANCEL_NOTICE_MS).toISOString();
       const res = await fetch(`/api/orders?outlet=${outletId}&status=accepted,preparing,ready&since=${encodeURIComponent(since)}`, { cache: "no-store" });
       if (res.status === 401) {
-        window.location.href = `/pin/${outletId}?next=/kds/${outletId}`;
+        router.push(`/pin/${outletId}?next=/kds/${outletId}`);
         return;
       }
       if (!res.ok) throw new Error();
@@ -207,7 +209,7 @@ export function KdsBoard({
     } catch {
       setError("Couldn’t load orders.");
     }
-  }, [outletId]);
+  }, [outletId, router]);
 
   const connection = useBroadcast({
     client,

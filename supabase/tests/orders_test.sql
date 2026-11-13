@@ -39,7 +39,7 @@ select is(
     '{"subtotal": 1, "serviceCharge": 0, "tax": 0, "rounding": 0, "total": 1}', '[]')),
   false, 'replaying an idempotency key returns the original order'
 );
-select is((select count(*) from public.orders)::int, 1, 'a double tap creates exactly one order');
+select is((select count(*) from public.orders where session_id = '60000000-0000-0000-0000-0000000000a1')::int, 1, 'a double tap creates exactly one order');
 select throws_ok(
   $$ select * from public.place_order('60000000-0000-0000-0000-0000000000b1', 'key-aaaaaaaa', null,
        '{"subtotal": 1, "serviceCharge": 0, "tax": 0, "rounding": 0, "total": 1}', '[]') $$,
