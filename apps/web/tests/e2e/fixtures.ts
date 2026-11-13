@@ -84,3 +84,27 @@ export async function seedMenu(owner: Owner) {
   ]);
   return { categoryId: cat!.id, items: items! };
 }
+
+export async function seedTable(owner: Owner, label = "T1") {
+  const { data, error } = await admin()
+    .from("tables")
+    .insert({ tenant_id: owner.tenantId, outlet_id: owner.outletId, label })
+    .select("id, qr_token")
+    .single();
+  if (error) throw error;
+  return data;
+}
+
+/** Moves an order the way staff would, through the same SQL function. */
+export async function staffTransition(orderId: string, from: string, to: string) {
+  const { data, error } = await admin().rpc("transition_order", {
+    p_order: orderId,
+    p_from: from as never,
+    p_to: to as never,
+    p_actor_type: "staff",
+    p_actor_id: null as never,
+    p_reason: null as never,
+  });
+  if (error) throw error;
+  return data;
+}

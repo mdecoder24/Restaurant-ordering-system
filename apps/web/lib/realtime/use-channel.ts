@@ -31,7 +31,7 @@ export function useBroadcast({
   const key = topics.join("|");
 
   useEffect(() => {
-    if (!client || !enabled) return;
+    if (!client || !enabled || !key) return;
     let connectedOnce = false;
     const channels: RealtimeChannel[] = key.split("|").map((topic) =>
       client
