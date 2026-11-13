@@ -144,7 +144,7 @@ export function MenuEditor({ categories, items, canEdit }: Props) {
     <PageBody>
       <PageHeader
         title="Menu"
-        description={canEdit ? "Categories on the left, items on the right. Drag to reorder." : "Mark items sold out as stock runs low."}
+        description={canEdit ? "Pick a category to edit its items. Drag to reorder." : "Mark items sold out as stock runs low."}
         actions={
           canEdit ? (
             <>

@@ -263,7 +263,8 @@ export function TablesBoard({ outletId, tables, role }: { outletId: string; tabl
 
   return (
     <PageBody>
-      <ConnectionBanner state={connection} />
+      {/* Hidden banner is 0px tall but would still take the page gap; cancel it. */}
+      <ConnectionBanner state={connection} className="data-[visible=false]:-mb-6" />
       <PageHeader
         title="Tables"
         description={tables.length ? `${counts.occupied} of ${tables.length} occupied${counts.bill ? ` · ${counts.bill} asking for the bill` : ""}` : "Each table gets its own QR code."}

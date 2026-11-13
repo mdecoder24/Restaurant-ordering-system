@@ -152,10 +152,13 @@ export function OrdersBoard({ outletId, groups, role, canteen }: { outletId: str
 
   return (
     <PageBody>
-      <ConnectionBanner state={connection} />
+      {/* Hidden banner is 0px tall but would still take the page gap; cancel it. */}
+      <ConnectionBanner state={connection} className="data-[visible=false]:-mb-6" />
       <PageHeader
         title="Live orders"
-        description={groups.length ? `${groups.length} ${canteen ? "open tokens" : "tables with orders"}` : "Orders appear here the moment guests place them."}
+        description={groups.length ? canteen
+              ? `${groups.length} open ${groups.length === 1 ? "token" : "tokens"}`
+              : `${groups.length} ${groups.length === 1 ? "table" : "tables"} with orders` : "Orders appear here the moment guests place them."}
         actions={
           <div className="inline-flex rounded-md bg-surface-2 p-1" role="tablist" aria-label="Filter orders">
             {([

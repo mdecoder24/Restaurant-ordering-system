@@ -15,6 +15,7 @@ import { Switch } from "@/components/ui/switch";
 import { toast } from "@/components/ui/toaster";
 import type { Role } from "@/lib/auth/dal";
 import { cn } from "@/lib/cn";
+import { initials } from "@/lib/initials";
 import { addStaff, updateStaff } from "@/lib/staff/actions";
 
 export type StaffRow = {
@@ -99,7 +100,7 @@ export function StaffList({
               {rows.map((m) => (
                 <li key={m.id} className={cn("flex items-center gap-3 px-4 py-3", !m.active && "text-muted")}>
                   <span className="grid size-9 shrink-0 place-items-center rounded-full bg-surface-2 text-caption font-bold">
-                    {m.name.split(/\s+/).map((p) => p[0]).join("").slice(0, 2).toUpperCase()}
+                    {initials(m.name)}
                   </span>
                   <div className="min-w-0 flex-1">
                     <p className="flex items-center gap-2 text-small font-semibold">

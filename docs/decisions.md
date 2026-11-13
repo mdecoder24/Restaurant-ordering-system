@@ -81,3 +81,14 @@ Format: date · decision · reason. Per AGENTS.md §2, unspecified choices are r
 - **Landing hero is a 3D scene** (`components/marketing/hero-scene.tsx`): phone, live ticket, a folded QR table tent (`qr-tent.tsx`, decorative and deliberately not scannable) and confirmation chips at different depths, window-tracked parallax, per-layer float on separate phases. Mobile uses CSS `zoom` steps so the fixed-size scene fits.
 - **Where 3D is used**: landing, auth brand panel, and the guest tracker's "ready" moment (a one-off flip). Not in the dashboard, KDS or menu, which staff and guests use repeatedly, so motion there stays short and flat.
 - Under reduced motion, floats, sway, parallax and the floor glide stop; entrances become fades.
+
+## 2026-11-13 · UX and API fixes from a full crawl
+
+- **Login form never remounts.** It was the Suspense fallback and was replaced by a second copy once `searchParams` resolved, wiping typed or autofilled values. Only the hidden `next` field now waits on `searchParams`.
+- **Platform admins land on `/admin` after login**, not on "create a business" (they usually have no outlet).
+- **Realtime status is per topic** (`useBroadcast`): the screen is online only when every topic is subscribed, and callbacks from channels torn down by an effect cleanup are ignored, so a late `CLOSED` can no longer leave "Reconnecting…" on screen.
+- **Anonymous Supabase clients use their own storage keys** (`kx-display`, `kx-guest`), so they never share auth state with a staff client on the same device. The guest realtime token retries on 5xx/429 instead of silently stopping.
+- **`GET /api/orders/:id/events` answers 404** for orders that don't exist or aren't visible under RLS (it returned `200 []`), and 500 on a query error.
+- **Platform admin tenant list**: search by name or slug, 25 per page.
+- Copy and polish: pluralised "1 table"/"1 token", initials skip punctuation (`lib/initials.ts`), the hidden connection banner no longer leaves a gap above dashboard headers, empty states on the pickup display, analytics says when there is no earlier period, menu description fits the phone layout.
+- **Local dev note**: running `next build` (e2e) while `next dev` is up can corrupt `.next/dev` and make Turbopack reload every page in a loop. Stop dev and delete `apps/web/.next/dev` to recover.

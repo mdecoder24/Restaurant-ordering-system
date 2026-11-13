@@ -52,6 +52,7 @@ export function PickupDisplay({ outletId, initial }: { outletId: string; initial
       <main className="grid min-h-0 flex-1 grid-cols-1 gap-6 px-8 pb-8 md:grid-cols-[1fr_1.4fr]">
         <section aria-labelledby="prep" className="flex flex-col rounded-lg bg-surface p-6">
           <h2 id="prep" className="text-h2 font-bold text-muted uppercase">Preparing</h2>
+          {board.preparing.length === 0 ? <p className="mt-4 text-h2 text-muted/70">Nothing cooking right now</p> : null}
           <ul className="mt-4 flex flex-wrap content-start gap-4">
             {board.preparing.map((t) => (
               <li key={t} className="swap-in font-display text-[3.5rem] leading-none font-extrabold text-muted tabular">
@@ -62,6 +63,7 @@ export function PickupDisplay({ outletId, initial }: { outletId: string; initial
         </section>
         <section aria-labelledby="ready" aria-live="polite" className="flex flex-col rounded-lg border-2 border-success bg-success/10 p-6">
           <h2 id="ready" className="text-h2 font-bold text-success uppercase">Ready to collect</h2>
+          {board.ready.length === 0 ? <p className="mt-4 text-h2 text-success/70">No tokens ready yet</p> : null}
           <ul className="mt-4 flex flex-wrap content-start gap-6">
             {board.ready.map((t) => (
               <li key={t} className={cn("swap-in font-display text-[5.5rem] leading-none font-extrabold text-success tabular", fresh.has(t) && "kds-flash rounded-lg px-2")}>

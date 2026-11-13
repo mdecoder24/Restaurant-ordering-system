@@ -58,7 +58,7 @@ export function AnalyticsView({ data }: { data: Analytics }) {
       />
 
       <div className="grid gap-4 sm:grid-cols-2 xl:grid-cols-4">
-        <KpiCard className="rise-in" style={at(0)} label="Revenue" value={formatInr(data.totals.revenue)} icon={IndianRupee} delta={delta(data.totals.revenue, data.previous.revenue)} hint="vs previous period" />
+        <KpiCard className="rise-in" style={at(0)} label="Revenue" value={formatInr(data.totals.revenue)} icon={IndianRupee} delta={delta(data.totals.revenue, data.previous.revenue)} hint={data.previous.revenue ? "vs previous period" : "No earlier period to compare"} />
         <KpiCard className="rise-in" style={at(1)} label="Orders" value={String(data.totals.orders)} icon={ClipboardList} delta={delta(data.totals.orders, data.previous.orders)} hint={`${data.totals.cancelled} cancelled`} />
         <KpiCard className="rise-in" style={at(2)} label="Average order" value={formatInr(data.totals.aov)} icon={Receipt} delta={delta(data.totals.aov, data.previous.aov)} />
         <KpiCard className="rise-in" style={at(3)} label="Avg prep time" value={prep == null ? "–" : `${Math.floor(prep / 60)}m ${prep % 60}s`} icon={ChefHat} hint="Accepted to ready" />

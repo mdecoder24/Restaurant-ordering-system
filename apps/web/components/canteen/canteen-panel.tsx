@@ -46,7 +46,8 @@ export function CanteenPanel({ outletId, groups, items, role, prepaidOnly }: { o
 
   return (
     <PageBody>
-      <ConnectionBanner state={connection} />
+      {/* Hidden banner is 0px tall but would still take the page gap; cancel it. */}
+      <ConnectionBanner state={connection} className="data-[visible=false]:-mb-6" />
       <PageHeader
         title="Counter"
         description={prepaidOnly ? "Prepaid only: orders reach the kitchen after payment." : "Guests order with a token and collect here."}

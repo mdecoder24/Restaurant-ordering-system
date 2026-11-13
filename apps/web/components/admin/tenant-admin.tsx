@@ -1,7 +1,7 @@
 "use client";
 
 import { formatInr } from "@krudex/core/format";
-import { Building2, LogOut, Plus, ShieldCheck } from "lucide-react";
+import { Building2, LogOut, Plus, Search, ShieldCheck } from "lucide-react";
 import { useState, useTransition } from "react";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
@@ -9,6 +9,7 @@ import { Dialog, DialogClose } from "@/components/ui/dialog";
 import { EmptyState } from "@/components/ui/empty-state";
 import { Field } from "@/components/ui/field";
 import { Input } from "@/components/ui/input";
+import { Pagination } from "@/components/ui/pagination";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
 import { toast } from "@/components/ui/toaster";
@@ -28,12 +29,23 @@ export type TenantRow = {
   revenue30: number;
 };
 
+const PAGE_SIZE = 25;
+
 const blank = { name: "", slug: "", ownerEmail: "", ownerName: "", outletName: "Main", mode: "dine_in" as "dine_in" | "canteen" };
 
 export function TenantAdmin({ email, rows, audit }: { email: string; rows: TenantRow[]; audit: { id: number; action: string; tenant: string; at: string }[] }) {
   const [pending, start] = useTransition();
   const [confirm, setConfirm] = useState<TenantRow | null>(null);
   const [creating, setCreating] = useState<typeof blank | null>(null);
+  const [query, setQuery] = useState("");
+  const [page, setPage] = useState(1);
+  // Newest first (server order). Filter by name or slug, then page, so the table stays usable
+  // once the platform has hundreds of tenants.
+  const q = query.trim().toLowerCase();
+  const filtered = q ? rows.filter((t) => t.name.toLowerCase().includes(q) || t.slug.toLowerCase().includes(q)) : rows;
+  const pageCount = Math.max(1, Math.ceil(filtered.length / PAGE_SIZE));
+  const current = Math.min(page, pageCount);
+  const visible = filtered.slice((current - 1) * PAGE_SIZE, current * PAGE_SIZE);
   const run = (fn: () => Promise<{ ok: boolean; error?: string }>, msg: string) =>
     start(async () => {
       const r = await fn();
@@ -59,9 +71,34 @@ export function TenantAdmin({ email, rows, audit }: { email: string; rows: Tenan
         </form>
       </header>
 
+      {rows.length > 0 ? (
+        <div className="flex flex-wrap items-center gap-3">
+          <div className="relative w-full max-w-sm">
+            <Search className="pointer-events-none absolute top-1/2 left-3 size-4 -translate-y-1/2 text-muted" aria-hidden />
+            <Input
+              type="search"
+              aria-label="Search tenants"
+              placeholder="Search by name or slug"
+              value={query}
+              onChange={(e) => {
+                setQuery(e.target.value);
+                setPage(1);
+              }}
+              className="pl-9"
+            />
+          </div>
+          <p className="text-small text-muted tabular">
+            {filtered.length} of {rows.length} tenants
+          </p>
+          {pageCount > 1 ? <Pagination className="ml-auto" page={current} pageCount={pageCount} onPageChange={setPage} /> : null}
+        </div>
+      ) : null}
+
       <div className="overflow-hidden rounded-lg border border-border bg-surface shadow-sm">
         {rows.length === 0 ? (
           <EmptyState icon={Building2} title="No tenants yet" />
+        ) : filtered.length === 0 ? (
+          <EmptyState icon={Search} title="No tenants match" description="Try a different name or slug." />
         ) : (
           <Table>
             <TableHeader>
@@ -76,7 +113,7 @@ export function TenantAdmin({ email, rows, audit }: { email: string; rows: Tenan
               </TableRow>
             </TableHeader>
             <TableBody>
-              {rows.map((t) => (
+              {visible.map((t) => (
                 <TableRow key={t.id}>
                   <TableCell>
                     <span className="block font-semibold">{t.name}</span>

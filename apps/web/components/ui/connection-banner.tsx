@@ -22,6 +22,7 @@ export function ConnectionBanner({
     <div
       role="status"
       aria-live="polite"
+      data-visible={visible}
       className={cn(
         "grid transition-[grid-template-rows,opacity] duration-[var(--motion-base)] ease-out",
         visible ? "grid-rows-[1fr] opacity-100" : "grid-rows-[0fr] opacity-0",

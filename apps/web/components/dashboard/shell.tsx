@@ -18,6 +18,7 @@ import { Sheet } from "@/components/ui/sheet";
 import { signOut, switchOutlet } from "@/lib/auth/actions";
 import type { OutletMode, Role } from "@/lib/auth/dal";
 import { cn } from "@/lib/cn";
+import { initials } from "@/lib/initials";
 import { kitchenNav, visibleNav } from "./nav";
 
 export type ShellProps = {
@@ -113,12 +114,7 @@ function OutletSwitcher({ outlet, outlets }: Pick<ShellProps, "outlet" | "outlet
 }
 
 function Account({ displayName, email, role }: Pick<ShellProps, "displayName" | "email" | "role">) {
-  const initials = displayName
-    .split(/\s+/)
-    .map((p) => p[0])
-    .join("")
-    .slice(0, 2)
-    .toUpperCase();
+  const avatar = initials(displayName);
   return (
     <DropdownMenu>
       <DropdownMenuTrigger asChild>
@@ -127,7 +123,7 @@ function Account({ displayName, email, role }: Pick<ShellProps, "displayName" | 
           className="press flex w-full items-center gap-2.5 rounded-md p-2 text-left transition-colors duration-[var(--motion-fast)] hover-fine:bg-surface"
         >
           <span className="grid size-8 shrink-0 place-items-center rounded-full bg-primary-soft text-caption font-bold text-primary">
-            {initials || "?"}
+            {avatar}
           </span>
           <span className="min-w-0 flex-1">
             <span className="block truncate text-small font-semibold">{displayName}</span>
