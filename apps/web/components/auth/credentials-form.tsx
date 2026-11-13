@@ -1,18 +1,18 @@
 "use client";
 
 import Link from "next/link";
-import { useActionState } from "react";
+import { useActionState, type ReactNode } from "react";
 import { logIn, signUp, type FormState } from "@/lib/auth/actions";
 import { Button } from "@/components/ui/button";
 import { Field } from "@/components/ui/field";
 import { Input } from "@/components/ui/input";
 import { FormError } from "./form-error";
 
-export function CredentialsForm({ mode, next }: { mode: "login" | "signup"; next?: string }) {
+export function CredentialsForm({ mode, nextField }: { mode: "login" | "signup"; nextField?: ReactNode }) {
   const [state, action, pending] = useActionState<FormState, FormData>(mode === "login" ? logIn : signUp, {});
   return (
     <form action={action} className="flex flex-col gap-4" noValidate>
-      {next ? <input type="hidden" name="next" value={next} /> : null}
+      {nextField}
       <FormError message={state.error} />
       <Field label="Email" error={state.fieldErrors?.email}>
         <Input name="email" type="email" autoComplete="email" required defaultValue={state.values?.email} />

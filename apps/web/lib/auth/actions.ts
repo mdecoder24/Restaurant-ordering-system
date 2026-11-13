@@ -4,6 +4,7 @@ import { onboardingSchema, pinLoginSchema } from "@krudex/core/schemas";
 import { cookies, headers } from "next/headers";
 import { redirect } from "next/navigation";
 import { z } from "zod";
+import { getPlatformAdmin } from "@/lib/admin/auth";
 import { clientIp, rateLimit } from "@/lib/rate-limit";
 import { createAdminClient } from "@/lib/supabase/admin";
 import { createClient } from "@/lib/supabase/server";
@@ -69,7 +70,9 @@ export async function logIn(_: FormState, form: FormData): Promise<FormState> {
   if (error) return { error: "Email or password is incorrect.", values: kept };
 
   const session = await getSession();
-  const fallback = session.status === "ok" ? roleHome[session.role] : "/onboarding";
+  // Platform operators usually have no outlet; send them to /admin, not "create a business".
+  const fallback =
+    session.status === "ok" ? roleHome[session.role] : (await getPlatformAdmin()) ? "/admin" : "/onboarding";
   redirect(safeNext(form.get("next"), fallback));
 }
 
