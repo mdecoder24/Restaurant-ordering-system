@@ -2,7 +2,7 @@
 
 import { computeBill } from "@krudex/core/bill";
 import { formatInr } from "@krudex/core/format";
-import { ChevronRight, ImageOff, Leaf, Plus, Search, ShoppingBag, UtensilsCrossed, X } from "lucide-react";
+import { ChevronRight, Leaf, MapPin, Plus, Search, ShoppingBag, UtensilsCrossed, X } from "lucide-react";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { useEffect, useMemo, useRef, useState, type CSSProperties } from "react";
@@ -108,29 +108,28 @@ function ItemCard({
         </span>
         {item.description ? <span className="mt-1 line-clamp-2 block text-small text-muted">{item.description}</span> : null}
       </button>
-      <div className="relative flex w-24 shrink-0 flex-col items-center">
-        <button
-          type="button"
-          onClick={onOpen}
-          disabled={soldOut}
-          tabIndex={-1}
-          aria-hidden
-          className="grid size-24 place-items-center overflow-hidden rounded-md bg-surface-2"
-        >
-          {url ? (
-            // eslint-disable-next-line @next/next/no-img-element -- CDN image with explicit size
+      <div className={cn("relative flex shrink-0 flex-col items-center", url ? "w-24" : "w-auto self-center")}>
+        {/* Without a photo the Add control stands alone; an empty image tile reads as broken. */}
+        {url ? (
+          <button
+            type="button"
+            onClick={onOpen}
+            disabled={soldOut}
+            tabIndex={-1}
+            aria-hidden
+            className="press size-24 overflow-hidden rounded-md bg-surface-2 shadow-sm"
+          >
+            {/* eslint-disable-next-line @next/next/no-img-element -- CDN image with explicit size */}
             <img src={url} alt="" width={96} height={96} loading="lazy" decoding="async" className="size-full object-cover" />
-          ) : (
-            <ImageOff className="size-5 text-muted" />
-          )}
-        </button>
-        <div className="-mt-4">
+          </button>
+        ) : null}
+        <div className={url ? "-mt-4" : undefined}>
           {soldOut ? (
             <span className="inline-flex h-8 items-center rounded-pill border border-border bg-surface px-3 text-caption font-semibold text-muted shadow-sm">
               Sold out
             </span>
           ) : qtyInCart > 0 && !hasOptions(item) ? (
-            <QuantityStepper value={qtyInCart} onChange={onQty} itemName={item.name} className="bg-surface shadow-sm" />
+            <QuantityStepper value={qtyInCart} onChange={onQty} itemName={item.name} className="swap-in bg-surface shadow-sm" />
           ) : (
             <button
               type="button"
@@ -170,6 +169,7 @@ export function GuestMenuView({
   const [problem, setProblem] = useState<{ itemId?: string; message: string } | null>(null);
   const [currentCat, setCurrentCat] = useState(menu.categories[0]?.id ?? "");
   const tabsRef = useRef<HTMLDivElement>(null);
+  const cartBarRef = useRef<HTMLButtonElement>(null);
   const bill = useBillPreview(cart.entries, outlet);
 
   const q = query.trim().toLowerCase();
@@ -219,6 +219,17 @@ export function GuestMenuView({
       note: "",
     });
     setProblem(null);
+    bumpCart();
+  };
+
+  // A small pulse on the cart bar confirms the add without a toast. WAAPI so rapid taps retarget.
+  const bumpCart = () => {
+    const el = cartBarRef.current;
+    if (!el || window.matchMedia("(prefers-reduced-motion: reduce)").matches) return;
+    el.animate([{ transform: "scale(1)" }, { transform: "scale(1.025)" }, { transform: "scale(1)" }], {
+      duration: 280,
+      easing: "cubic-bezier(0.23, 1, 0.32, 1)",
+    });
   };
 
   const place = async () => {
@@ -257,13 +268,17 @@ export function GuestMenuView({
 
   return (
     <div className="pb-28">
-      <header className="px-4 pt-5 pb-3">
-        <div className="flex items-start justify-between gap-3">
+      <header className="px-4 pt-6 pb-4">
+        <div className="rise-in flex items-start justify-between gap-3">
           <div className="min-w-0">
             <p className="truncate text-caption font-semibold tracking-wide text-primary uppercase">{outlet.tenantName}</p>
             <h1 className="truncate font-display text-h1 font-bold tracking-tight">{outlet.name}</h1>
+            <p className="mt-0.5 text-small text-muted">
+              {outlet.mode === "canteen" ? "Order ahead, collect at the counter." : "Order from your table. We’ll bring it over."}
+            </p>
           </div>
-          <span className="shrink-0 rounded-pill bg-surface-2 px-3 py-1.5 text-small font-semibold">
+          <span className="inline-flex shrink-0 items-center gap-1.5 rounded-pill border border-border bg-surface px-3 py-1.5 text-small font-semibold shadow-sm">
+            <MapPin className="size-3.5 text-primary" aria-hidden strokeWidth={2.5} />
             {outlet.tableLabel ? `Table ${outlet.tableLabel}` : "Pickup"}
           </span>
         </div>
@@ -379,6 +394,7 @@ export function GuestMenuView({
       >
         <button
           type="button"
+          ref={cartBarRef}
           onClick={() => setCartOpen(true)}
           tabIndex={count > 0 ? 0 : -1}
           className="press sheen flex h-14 w-full items-center gap-3 rounded-lg bg-primary px-4 text-primary-fg shadow-[var(--shadow-lg),var(--highlight-inset)]"
@@ -403,6 +419,7 @@ export function GuestMenuView({
             cartApi.add(entry);
             setProblem(null);
             setOpenItem(null);
+            bumpCart();
             toast.success(`${entry.name} added`);
           }}
         />

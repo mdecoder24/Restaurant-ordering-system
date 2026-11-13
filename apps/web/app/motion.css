@@ -198,6 +198,90 @@
   mask-image: radial-gradient(ellipse 70% 60% at 50% 40%, black 30%, transparent 75%);
 }
 
+/*
+ * Scroll reveals for the landing page. Scroll-driven (no JS, off the main thread); browsers
+ * without `animation-timeline` and reduced-motion users simply see the content in place.
+ * `--i` adds a small range offset so siblings cascade.
+ */
+@keyframes reveal-up {
+  from {
+    opacity: 0;
+    transform: translateY(28px);
+    filter: blur(4px);
+  }
+}
+@keyframes reveal-line {
+  from {
+    transform: scaleX(0);
+  }
+}
+@keyframes bar-grow {
+  from {
+    transform: scaleY(0.15);
+  }
+}
+@supports (animation-timeline: view()) {
+  @media (prefers-reduced-motion: no-preference) {
+    .reveal {
+      animation: reveal-up linear both;
+      animation-timing-function: var(--ease-out);
+      animation-timeline: view();
+      animation-range: entry calc(var(--i, 0) * 6%) entry calc(55% + var(--i, 0) * 6%);
+    }
+    .reveal-line {
+      animation: reveal-line linear both;
+      animation-timeline: view();
+      animation-range: entry 20% cover 45%;
+    }
+    .station-bar {
+      animation: bar-grow linear both;
+      animation-timing-function: var(--ease-out);
+      animation-timeline: view();
+      animation-range: entry calc(10% + var(--i, 0) * 5%) cover calc(40% + var(--i, 0) * 4%);
+    }
+  }
+}
+
+/* Station illustrations: a gentle bob on the cart bar and a "new ticket" glow on the KDS. */
+@keyframes station-bob {
+  0%,
+  100% {
+    transform: translateY(0);
+  }
+  50% {
+    transform: translateY(-3px);
+  }
+}
+.station-bob {
+  animation: station-bob 3.2s var(--ease-in-out) infinite;
+}
+@keyframes station-ticket {
+  0%,
+  60%,
+  100% {
+    box-shadow: var(--shadow-sm);
+  }
+  75% {
+    box-shadow: 0 0 0 3px color-mix(in oklab, var(--status-placed) 45%, transparent);
+  }
+}
+.station-ticket {
+  animation: station-ticket 3s var(--ease-in-out) infinite;
+}
+
+.dot-grid-soft {
+  background-image: radial-gradient(color-mix(in oklab, var(--color-text) 7%, transparent) 1px, transparent 1px);
+  background-size: 16px 16px;
+}
+/* Fine grid on the solid brand CTA; fades towards the bottom-right. */
+.cta-grid {
+  background-image:
+    linear-gradient(color-mix(in oklab, var(--color-primary-fg) 9%, transparent) 1px, transparent 1px),
+    linear-gradient(90deg, color-mix(in oklab, var(--color-primary-fg) 9%, transparent) 1px, transparent 1px);
+  background-size: 32px 32px;
+  mask-image: radial-gradient(ellipse 80% 90% at 20% 0%, black 20%, transparent 70%);
+}
+
 /* KDS new-ticket flash (K-03): a brief glow ring, paired with the chime. */
 @keyframes kds-flash {
   0%,
@@ -240,7 +324,9 @@
     animation-name: fade-in;
   }
   .glow-drift,
-  .ping-ring {
+  .ping-ring,
+  .station-bob,
+  .station-ticket {
     animation: none;
   }
   .sheen::after {

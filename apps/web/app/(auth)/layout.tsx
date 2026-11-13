@@ -6,6 +6,9 @@ import { Toaster } from "@/components/ui/toaster";
 /** Staff auth: form on the left, a calm brand panel on the right from lg up. */
 export default function AuthLayout({ children }: { children: React.ReactNode }) {
   return (
+    // Toaster sits outside the grid: as a third grid child it opened a second row and the
+    // brand panel stopped short of the viewport bottom.
+    <>
     <div data-density="dashboard" className="grid min-h-dvh lg:grid-cols-[minmax(0,1fr)_minmax(0,1.05fr)]">
       <div className="flex flex-col px-6 py-8 sm:px-10">
         <Link href="/" className="self-start rounded-md" aria-label="Krudex home">
@@ -23,7 +26,8 @@ export default function AuthLayout({ children }: { children: React.ReactNode }) 
           </p>
         </div>
       </aside>
-      <Toaster />
     </div>
+    <Toaster />
+    </>
   );
 }

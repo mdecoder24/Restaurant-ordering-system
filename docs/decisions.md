@@ -65,3 +65,11 @@ Format: date · decision · reason. Per AGENTS.md §2, unspecified choices are r
 - **E2E runs against a production build** locally and in CI. `next dev` with Turbopack hot-reloads mid-test when anything is written inside the app dir, which made specs flaky.
 - **Seed UUIDs** use the RFC version/variant nibbles because Zod 4's `z.uuid()` rejects others.
 - **`place_order` race**: a second identical request now re-checks the idempotency key after taking the session lock (and catches the unique violation as a backstop), so a true double tap returns the first order without burning an order number.
+
+## 2026-11-13 · Landing and guest polish
+
+- **Landing is a product page, not a dev link.** Header with Log in / Get started, hero CTAs to `/signup` and `/login`, how-it-works, station cards, feature grid, closing CTA, footer. The `/preview` link remains only when `previewEnabled`, as a small developer link. No metrics or testimonials: we have none that are real (rule 11).
+- **Scroll reveals are CSS scroll-driven animations** (`animation-timeline: view()`, `.reveal` in `app/motion.css`). No JS, off the main thread, no new dependency. Browsers without support and reduced-motion users see content in place.
+- **Station illustrations** (`components/marketing/station-visual.tsx`) are token-only decorative mock-ups, `aria-hidden`.
+- **Guest menu items without a photo drop the image tile** instead of showing a placeholder icon; the Add control stands alone. Quick-add pulses the cart bar (WAAPI, 280ms, skipped under reduced motion) instead of a toast.
+- **Auth layout**: the Toaster moved out of the two-column grid; as a third grid child it created a second row and the brand panel stopped short of the viewport bottom.
