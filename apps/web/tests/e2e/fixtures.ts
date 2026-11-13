@@ -108,3 +108,31 @@ export async function staffTransition(orderId: string, from: string, to: string)
   if (error) throw error;
   return data;
 }
+
+/** Places an order through the guest API, exactly as a phone would. */
+export async function guestOrder(request: import("@playwright/test").APIRequestContext, qrToken: string, itemId: string, qty = 1) {
+  const res = await request.post("/api/guest/orders", {
+    data: { qr: qrToken, lines: [{ item_id: itemId, variant_id: null, addon_ids: [], qty }] },
+    headers: { "Idempotency-Key": `e2e-${Date.now()}-${Math.random().toString(36).slice(2)}` },
+  });
+  const json = await res.json();
+  if (!res.ok()) throw new Error(JSON.stringify(json));
+  return json.data as { order_id: string; order_no: number };
+}
+
+/** A PIN-only staff member (synthetic user), as created from the Staff screen. */
+export async function createPinStaff(owner: Owner, role: "kitchen" | "waiter", pin: string) {
+  const bcrypt = (await import("bcryptjs")).default;
+  const key = crypto.randomUUID();
+  const { data: user, error } = await admin().auth.admin.createUser({ email: `pin-${key}@staff.krudex.invalid`, email_confirm: true });
+  if (error) throw error;
+  const { error: mErr } = await admin().from("members").insert({
+    tenant_id: owner.tenantId,
+    user_id: user.user!.id,
+    display_name: role === "kitchen" ? "Cook" : "Waiter",
+    role,
+    outlet_id: owner.outletId,
+    pin_hash: await bcrypt.hash(pin, 10),
+  });
+  if (mErr) throw mErr;
+}

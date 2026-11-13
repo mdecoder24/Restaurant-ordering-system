@@ -1,12 +1,10 @@
 import type { OpenHours } from "@krudex/core/schemas";
 
-const days = ["sun", "mon", "tue", "wed", "thu", "fri", "sat"] as const;
-
 /** Open-hours check in the outlet's timezone. No hours configured means always open. */
 export function isOpenNow(hours: OpenHours | null | undefined, timezone: string, at = new Date()): boolean {
   if (!hours || Object.keys(hours).length === 0) return true;
   const parts = new Intl.DateTimeFormat("en-US", { timeZone: timezone, weekday: "short", hour: "2-digit", minute: "2-digit", hourCycle: "h23" }).formatToParts(at);
-  const wd = parts.find((p) => p.type === "weekday")?.value.toLowerCase().slice(0, 3) as (typeof days)[number];
+  const wd = parts.find((p) => p.type === "weekday")?.value.toLowerCase().slice(0, 3);
   const hhmm = `${parts.find((p) => p.type === "hour")?.value}:${parts.find((p) => p.type === "minute")?.value}`;
   const today = hours[wd as keyof OpenHours];
   if (!today) return false;

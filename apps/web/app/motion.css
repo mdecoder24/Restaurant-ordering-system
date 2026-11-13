@@ -198,6 +198,21 @@
   mask-image: radial-gradient(ellipse 70% 60% at 50% 40%, black 30%, transparent 75%);
 }
 
+/* KDS new-ticket flash (K-03): a brief glow ring, paired with the chime. */
+@keyframes kds-flash {
+  0%,
+  100% {
+    box-shadow: var(--shadow-md);
+  }
+  25%,
+  75% {
+    box-shadow: 0 0 0 6px color-mix(in oklab, var(--color-primary) 55%, transparent);
+  }
+}
+.kds-flash {
+  animation: kds-flash 1.2s var(--ease-in-out) 2;
+}
+
 /* Reduced motion means gentler, not none: keep fades, drop movement and scale. */
 @media (prefers-reduced-motion: reduce) {
   .popover-motion[data-state="open"],
