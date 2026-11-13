@@ -31,3 +31,23 @@ export function formatDuration(totalSeconds: number): string {
   if (hours > 0) return `${hours}:${String(minutes).padStart(2, "0")}:${seconds}`;
   return `${minutes}:${seconds}`;
 }
+
+/**
+ * Parses a rupee amount typed by staff ("120", "120.5", "1,250.00", "₹99") into integer
+ * paise without floating point. Returns null for anything that is not a valid amount.
+ */
+export function parseInr(input: string): number | null {
+  const cleaned = input.trim().replace(/^₹\s*/, "").replace(/,/g, "");
+  const match = /^(\d{1,9})(?:\.(\d{1,2}))?$/.exec(cleaned);
+  if (!match) return null;
+  const rupees = Number(match[1]);
+  const fraction = (match[2] ?? "").padEnd(2, "0");
+  return rupees * 100 + Number(fraction);
+}
+
+/** Paise to an editable rupee string: 12050 → "120.50", 12000 → "120". */
+export function paiseToInput(paise: number): string {
+  const rupees = Math.floor(paise / 100);
+  const rest = paise % 100;
+  return rest === 0 ? String(rupees) : `${rupees}.${String(rest).padStart(2, "0")}`;
+}
