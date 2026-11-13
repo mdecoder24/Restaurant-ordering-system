@@ -21,7 +21,7 @@ export function useGuestLive(
     let cancelled = false;
     let timer: ReturnType<typeof setTimeout>;
     const { url, anonKey } = supabasePublicConfig();
-    const c = createClient(url, anonKey, { auth: { persistSession: false, autoRefreshToken: false } });
+    const c = createClient(url, anonKey, { auth: { persistSession: false, autoRefreshToken: false, storageKey: "kx-guest" } });
     const authorise = async () => {
       try {
         const res = await fetch("/api/guest/realtime-token", {
@@ -29,7 +29,12 @@ export function useGuestLive(
           headers: { "Content-Type": "application/json" },
           body: JSON.stringify({ outlet_id: outletId }),
         });
-        if (!res.ok) return;
+        if (!res.ok) {
+          // 4xx: no session for this guest (nothing to follow yet). 5xx/429: retry with backoff,
+          // otherwise the tracker would silently stop updating while showing "online".
+          if (res.status >= 500 || res.status === 429) timer = setTimeout(authorise, 10_000);
+          return;
+        }
         const { data } = (await res.json()) as { data: { token: string; expiresAt: number; session_id: string } };
         if (cancelled) return;
         await c.realtime.setAuth(data.token);

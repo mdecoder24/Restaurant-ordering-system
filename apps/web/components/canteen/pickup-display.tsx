@@ -18,7 +18,11 @@ export function PickupDisplay({ outletId, initial }: { outletId: string; initial
   const client = useMemo(() => {
     if (typeof window === "undefined") return null;
     const { url, anonKey } = supabasePublicConfig();
-    return createClient(url, anonKey, { auth: { persistSession: false } }) as unknown as SupabaseClient;
+    // Own storage key: the anonymous display client must not share auth state with a staff
+    // client on the same device (supabase-js warns about duplicate GoTrue instances).
+    return createClient(url, anonKey, {
+      auth: { persistSession: false, autoRefreshToken: false, storageKey: "kx-display" },
+    }) as unknown as SupabaseClient;
   }, []);
 
   const refetch = useCallback(async () => {

@@ -35,31 +35,49 @@ export function useBroadcast({
 
   useEffect(() => {
     if (!client || !enabled || !key) return;
-    let connectedOnce = false;
-    const channels: RealtimeChannel[] = key.split("|").map((topic) =>
+    // Callbacks from channels torn down by this effect's cleanup (Strict Mode remounts, outlet
+    // switches) arrive after the replacement subscribes; `active` drops them so a stale CLOSED
+    // can't leave the banner stuck on "Reconnecting".
+    let active = true;
+    const topicList = key.split("|");
+    // One status per topic; the screen is only "online" when every topic is subscribed.
+    const status = new Map<string, "up" | "down">();
+    const joinedOnce = new Set<string>();
+    const publish = () => {
+      if (!active) return;
+      if (!navigator.onLine) return setState("offline");
+      setState(topicList.every((t) => status.get(t) === "up") ? "online" : "reconnecting");
+    };
+    const channels: RealtimeChannel[] = topicList.map((topic) =>
       client
         .channel(topic, { config: { private: isPrivate } })
-        .on("broadcast", { event: "*" }, (msg) => handlers.current.onEvent(topic, msg.event, (msg.payload ?? {}) as Record<string, unknown>))
-        .subscribe((status) => {
-          if (status === "SUBSCRIBED") {
-            setState("online");
-            if (connectedOnce) handlers.current.onResync?.();
-            connectedOnce = true;
-          } else if (status === "CHANNEL_ERROR" || status === "TIMED_OUT") {
-            setState("reconnecting");
-          } else if (status === "CLOSED") {
-            setState(navigator.onLine ? "reconnecting" : "offline");
+        .on("broadcast", { event: "*" }, (msg) => {
+          if (active) handlers.current.onEvent(topic, msg.event, (msg.payload ?? {}) as Record<string, unknown>);
+        })
+        .subscribe((s) => {
+          if (!active) return;
+          if (s === "SUBSCRIBED") {
+            status.set(topic, "up");
+            // Events missed while this topic was down are never replayed: reload state.
+            if (joinedOnce.has(topic)) handlers.current.onResync?.();
+            joinedOnce.add(topic);
+          } else if (s === "CHANNEL_ERROR" || s === "TIMED_OUT" || s === "CLOSED") {
+            status.set(topic, "down");
           }
+          publish();
         }),
     );
-    const offline = () => setState("offline");
+    const offline = () => {
+      if (active) setState("offline");
+    };
     const online = () => {
-      setState("reconnecting");
+      publish();
       handlers.current.onResync?.();
     };
     window.addEventListener("offline", offline);
     window.addEventListener("online", online);
     return () => {
+      active = false;
       window.removeEventListener("offline", offline);
       window.removeEventListener("online", online);
       for (const c of channels) void client.removeChannel(c);
