@@ -16,12 +16,15 @@ export function useBroadcast({
   onEvent,
   onResync,
   enabled = true,
+  isPrivate = true,
 }: {
   client: SupabaseClient | null;
   topics: string[];
   onEvent: (topic: string, event: string, payload: Record<string, unknown>) => void;
   onResync?: () => void;
   enabled?: boolean;
+  /** Only the canteen pickup topic is public (token numbers only). */
+  isPrivate?: boolean;
 }): ConnectionState {
   const [state, setState] = useState<ConnectionState>("online");
   const handlers = useRef({ onEvent, onResync });
@@ -35,7 +38,7 @@ export function useBroadcast({
     let connectedOnce = false;
     const channels: RealtimeChannel[] = key.split("|").map((topic) =>
       client
-        .channel(topic, { config: { private: true } })
+        .channel(topic, { config: { private: isPrivate } })
         .on("broadcast", { event: "*" }, (msg) => handlers.current.onEvent(topic, msg.event, (msg.payload ?? {}) as Record<string, unknown>))
         .subscribe((status) => {
           if (status === "SUBSCRIBED") {
@@ -61,7 +64,7 @@ export function useBroadcast({
       window.removeEventListener("online", online);
       for (const c of channels) void client.removeChannel(c);
     };
-  }, [client, key, enabled]);
+  }, [client, key, enabled, isPrivate]);
 
   return state;
 }

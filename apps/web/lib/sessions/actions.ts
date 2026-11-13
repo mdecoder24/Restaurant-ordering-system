@@ -1,11 +1,13 @@
 "use server";
 
 import { sumOrderTotals } from "@krudex/core/bill";
+import type { OrderStatus } from "@krudex/core/order-status";
 import { uuid } from "@krudex/core/schemas";
 import { refresh } from "next/cache";
 import { z } from "zod";
 import { actionStaff, isResult, type ActionResult } from "@/lib/actions";
 import type { StaffContext } from "@/lib/auth/dal";
+import { staffTransition } from "@/lib/orders/staff-transition";
 import { createAdminClient } from "@/lib/supabase/admin";
 import { createClient } from "@/lib/supabase/server";
 
@@ -61,6 +63,12 @@ export async function recordPayment(sessionId: string, input: z.infer<typeof pay
 export async function closeSession(sessionId: string): Promise<ActionResult<{ invoiceId: string | null }>> {
   const staff = await actionStaff(floor);
   if (isResult(staff)) return staff;
+  const r = await closeSessionAs(staff, sessionId);
+  if (r.ok) refresh();
+  return r;
+}
+
+async function closeSessionAs(staff: StaffContext, sessionId: string): Promise<ActionResult<{ invoiceId: string | null }>> {
   const session = await visibleSession(staff, sessionId);
   if (!session || session.status !== "open") return { ok: false, error: "This bill is already closed." };
 
@@ -94,7 +102,6 @@ export async function closeSession(sessionId: string): Promise<ActionResult<{ in
     p_totals: totals,
   });
   if (error) return { ok: false, error: error.message.includes("progress") ? "Some orders are still in progress." : "Couldn’t close the table." };
-  refresh();
   return { ok: true, data: { invoiceId: invoiceId ?? null } };
 }
 
@@ -106,6 +113,43 @@ export async function acknowledgeRequests(sessionId: string): Promise<ActionResu
   const admin = createAdminClient();
   const { error } = await admin.from("service_requests").update({ status: "acknowledged" }).eq("session_id", sessionId).eq("status", "open");
   if (error) return { ok: false, error: "Couldn’t update requests." };
+  refresh();
+  return { ok: true };
+}
+
+/**
+ * Canteen handover (C-03): ready → served, then the session closes on its own once it is
+ * fully paid and nothing else is in progress (Flow §4 step 6).
+ */
+export async function handOver(orderId: string): Promise<ActionResult<{ closed: boolean }>> {
+  const staff = await actionStaff(floor);
+  if (isResult(staff)) return staff;
+  if (!uuid.safeParse(orderId).success) return { ok: false, error: "Unknown order." };
+  const t = await staffTransition(staff, orderId, "served");
+  if (!t.ok) return { ok: false, error: t.message };
+  const { data: o } = await (await createClient()).from("orders").select("session_id").eq("id", orderId).single();
+  let closed = false;
+  if (o) {
+    const admin = createAdminClient();
+    const { data: bal } = await admin.rpc("session_balance", { p_session: o.session_id }).single();
+    const { count: active } = await admin
+      .from("orders")
+      .select("id", { count: "exact", head: true })
+      .eq("session_id", o.session_id)
+      .in("status", ["placed", "accepted", "preparing", "ready"]);
+    if (bal?.due === 0 && !active) closed = (await closeSessionAs(staff, o.session_id)).ok;
+  }
+  refresh();
+  return { ok: true, data: { closed } };
+}
+
+/** Status change from a server-rendered panel (canteen) using the same rules as the API. */
+export async function changeOrderStatus(orderId: string, to: OrderStatus, reason?: string): Promise<ActionResult> {
+  const staff = await actionStaff(["owner", "manager", "waiter"]);
+  if (isResult(staff)) return staff;
+  if (!uuid.safeParse(orderId).success) return { ok: false, error: "Unknown order." };
+  const t = await staffTransition(staff, orderId, to, reason);
+  if (!t.ok) return { ok: false, error: t.message };
   refresh();
   return { ok: true };
 }
