@@ -73,3 +73,11 @@ Format: date · decision · reason. Per AGENTS.md §2, unspecified choices are r
 - **Station illustrations** (`components/marketing/station-visual.tsx`) are token-only decorative mock-ups, `aria-hidden`.
 - **Guest menu items without a photo drop the image tile** instead of showing a placeholder icon; the Add control stands alone. Quick-add pulses the cart bar (WAAPI, 280ms, skipped under reduced motion) instead of a toast.
 - **Auth layout**: the Toaster moved out of the two-column grid; as a third grid child it created a second row and the brand panel stopped short of the viewport bottom.
+
+## 2026-11-13 · 3D motion
+
+- **CSS 3D, not WebGL.** The 3D scenes are DOM layers with `perspective`/`preserve-3d` and `translateZ`, so text stays crisp and accessible, colours follow tokens and dark mode, and no dependency is added. three.js (~600 KB) was rejected for decorative use.
+- **`components/motion/tilt.tsx`**: pointer-driven tilt with eased follow and optional glare. Fine pointers only, off under reduced motion, writes `transform` on the layer directly (no per-frame CSS variable restyle), and stops its rAF loop once settled.
+- **Landing hero is a 3D scene** (`components/marketing/hero-scene.tsx`): phone, live ticket, a folded QR table tent (`qr-tent.tsx`, decorative and deliberately not scannable) and confirmation chips at different depths, window-tracked parallax, per-layer float on separate phases. Mobile uses CSS `zoom` steps so the fixed-size scene fits.
+- **Where 3D is used**: landing, auth brand panel, and the guest tracker's "ready" moment (a one-off flip). Not in the dashboard, KDS or menu, which staff and guests use repeatedly, so motion there stays short and flat.
+- Under reduced motion, floats, sway, parallax and the floor glide stop; entrances become fades.
