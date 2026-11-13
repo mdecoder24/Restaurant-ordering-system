@@ -1,0 +1,23 @@
+import { cn } from "@/lib/cn";
+
+/** Fast spin reads as fast loading (perceived performance), so 600ms per turn. */
+export function Spinner({ className, label }: { className?: string; label?: string }) {
+  return (
+    <svg
+      viewBox="0 0 24 24"
+      fill="none"
+      role={label ? "img" : undefined}
+      aria-label={label}
+      aria-hidden={label ? undefined : true}
+      className={cn("size-[1.125em] animate-[spin_600ms_linear_infinite]", className)}
+    >
+      <circle cx="12" cy="12" r="9" stroke="currentColor" strokeOpacity="0.25" strokeWidth="2.5" />
+      <path
+        d="M21 12a9 9 0 0 0-9-9"
+        stroke="currentColor"
+        strokeWidth="2.5"
+        strokeLinecap="round"
+      />
+    </svg>
+  );
+}
