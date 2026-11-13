@@ -113,6 +113,34 @@ export type Database = {
           },
         ];
       };
+      admin_audit: {
+        Row: {
+          action: string;
+          admin_user_id: string;
+          created_at: string;
+          id: number;
+          payload: NonNullable<Json>;
+          tenant_id: string | null;
+        };
+        ComputedFields: never;
+        Insert: {
+          action: string;
+          admin_user_id: string;
+          created_at?: string;
+          id?: never;
+          payload?: NonNullable<Json>;
+          tenant_id?: string | null;
+        };
+        Update: {
+          action?: string;
+          admin_user_id?: string;
+          created_at?: string;
+          id?: never;
+          payload?: NonNullable<Json>;
+          tenant_id?: string | null;
+        };
+        Relationships: [];
+      };
       daily_metrics: {
         Row: {
           aov: number;
@@ -839,6 +867,22 @@ export type Database = {
             referencedColumns: ["id", "tenant_id"];
           },
         ];
+      };
+      platform_admins: {
+        Row: {
+          created_at: string;
+          user_id: string;
+        };
+        ComputedFields: never;
+        Insert: {
+          created_at?: string;
+          user_id: string;
+        };
+        Update: {
+          created_at?: string;
+          user_id?: string;
+        };
+        Relationships: [];
       };
       refunds: {
         Row: {
