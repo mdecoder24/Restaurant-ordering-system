@@ -44,7 +44,7 @@ test.describe("full dine-in run-through (T14, T16)", () => {
     // Settle in cash and close from the tables screen.
     await page.goto("/app/tables");
     await page.waitForLoadState("networkidle");
-    await page.getByRole("button", { name: /^Table T9, Occupied/ }).click();
+    await page.getByRole("button", { name: /^Table T9 .*Occupied/ }).click();
     const sheet = page.getByRole("dialog");
     await expect(sheet.getByText("₹294").last()).toBeVisible();
     await sheet.getByRole("button", { name: "Record payment" }).click();

@@ -52,3 +52,16 @@ Format: date · decision · reason. Per AGENTS.md §2, unspecified choices are r
 - **Payments**: gateway interface with Razorpay (REST + HMAC verification) and a **local test gateway** used only when Razorpay keys are absent and not in production (`PAYMENTS_FAKE=true` overrides). The test gateway settles through the same `applyGatewayEvent` code as real webhooks. Webhooks are deduplicated by event id in `webhook_events`; state only moves forward. Manual (cash/terminal) payments are recorded as `provider = 'manual'`.
 - **Canteen prepaid**: orders stay `placed` (hidden from the KDS) until capture, then move to `accepted` as `system`.
 - **SMS/WhatsApp receipts (G-11 optional)** not built: no messaging provider or credentials. Receipts are on screen and downloadable.
+
+## 2026-11-13 · T17–T21 and delivery
+
+- **Canteen handover closes the session** automatically when nothing is due and no order is in progress (Flow §4). Counter staff (waiter role) hand over and take cash; "Mark ready" stays with kitchen/managers as the state machine says.
+- **Pickup display uses a public realtime topic** carrying only token numbers and status.
+- **Analytics** read `daily_metrics`, refreshed by `pg_cron` (today every 15 min, yesterday nightly) and backfilled on demand when the page opens.
+- **Platform admins** are granted by SQL only (`platform_admins`); every admin action is written to the append-only `admin_audit`. Non-admins get a 404 at `/admin`. A-02 (impersonation) is P2 and not built.
+- **Security headers**: CSP limited to self, Supabase and Razorpay Checkout; `'unsafe-inline'` scripts are allowed because a nonce would make every route dynamic (no PPR). Plus HSTS, nosniff, frame-ancestors none, Permissions-Policy.
+- **Test payment gateway runs on localhost only** (any NODE_ENV with `PAYMENTS_FAKE=true`), never on a public host, because it lets a guest mark their own bill paid.
+- **Sentry not wired**: it needs a DSN (a credential we were not given, AGENTS §9). Errors go to route error boundaries and server logs; add `@sentry/nextjs` with the DSN at go-live.
+- **E2E runs against a production build** locally and in CI. `next dev` with Turbopack hot-reloads mid-test when anything is written inside the app dir, which made specs flaky.
+- **Seed UUIDs** use the RFC version/variant nibbles because Zod 4's `z.uuid()` rejects others.
+- **`place_order` race**: a second identical request now re-checks the idempotency key after taking the session lock (and catches the unique violation as a backstop), so a true double tap returns the first order without burning an order number.

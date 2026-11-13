@@ -57,7 +57,7 @@ function Ticket({
         "swap-in flex flex-col overflow-hidden rounded-lg border-2 bg-surface shadow-md",
         age === "overdue" ? "border-danger" : age === "warning" ? "border-warning" : "border-border",
         fresh && "kds-flash",
-        cancelled && "border-danger opacity-80",
+        cancelled && "border-danger",
       )}
     >
       <header className={cn("flex items-center justify-between gap-3 px-4 py-3", age === "overdue" ? "bg-danger/15" : age === "warning" ? "bg-warning/12" : "bg-surface-2")}>

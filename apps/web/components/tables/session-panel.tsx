@@ -74,7 +74,7 @@ export function SessionPanel({ table, role, onClosed }: { table: TableTileData; 
               <span className="text-small font-semibold tabular">Order #{o.orderNo}</span>
               <StatusBadge status={o.status} />
             </header>
-            <ul className={cn("px-3 py-2 text-small", (o.status === "rejected" || o.status === "cancelled") && "opacity-50 line-through")}>
+            <ul className={cn("px-3 py-2 text-small", (o.status === "rejected" || o.status === "cancelled") && "text-muted line-through")}>
               {o.items.map((i, idx) => (
                 <li key={idx} className="flex gap-2 py-0.5">
                   <span className="w-6 text-muted tabular">{i.qty}×</span>

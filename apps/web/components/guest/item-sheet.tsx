@@ -136,7 +136,7 @@ export function ItemSheet({
                   className={cn(
                     "press flex h-12 cursor-pointer items-center gap-3 rounded-md border px-3 transition-colors duration-[var(--motion-fast)]",
                     on ? "border-primary bg-primary-soft" : "border-border",
-                    full && "cursor-not-allowed opacity-50",
+                    full && "cursor-not-allowed text-muted",
                   )}
                 >
                   <input type="checkbox" className="sr-only" checked={on} disabled={full} onChange={() => toggle(g.id, a.id, g.max)} />

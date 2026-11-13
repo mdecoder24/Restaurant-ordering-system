@@ -301,14 +301,14 @@ export function MenuEditor({ categories, items, canEdit }: Props) {
                           <ImageOff className="size-4 text-muted" aria-hidden />
                         )}
                       </span>
-                      <div className={cn("min-w-0 flex-1", !available && "opacity-55")}>
+                      <div className={cn("min-w-0 flex-1", !available && "text-muted")}>
                         <p className="flex items-center gap-2 text-small font-semibold">
                           <DietMark veg={item.is_veg} size="sm" />
                           <span className="truncate">{item.name}</span>
                           {!available ? <Badge size="sm" tone="danger">Sold out</Badge> : null}
                         </p>
                         <p className="mt-0.5 flex flex-wrap items-center gap-x-2 text-caption text-muted">
-                          <span className="font-semibold text-text tabular">{formatInr(item.price)}</span>
+                          <span className={cn("font-semibold tabular", available ? "text-text" : "text-muted")}>{formatInr(item.price)}</span>
                           {item.variants.length ? <span>{item.variants.length} {item.variants.length === 1 ? "variant" : "variants"}</span> : null}
                           {item.addon_groups.length ? <span>{item.addon_groups.length} add-on {item.addon_groups.length === 1 ? "group" : "groups"}</span> : null}
                           {item.dietary_tags.filter((t) => t !== "veg").map((t) => (

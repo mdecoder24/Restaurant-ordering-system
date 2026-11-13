@@ -226,7 +226,7 @@ export function OrdersBoard({ outletId, groups, role, canteen }: { outletId: str
                 {(filter === "all" ? g.orders : g.visible).map((o) => {
                   const moves = nextStatuses(o.status, actor).filter((s) => s !== "preparing" && s !== "ready");
                   return (
-                    <li key={o.id} className={cn("px-4 py-3", (o.status === "rejected" || o.status === "cancelled") && "opacity-60")}>
+                    <li key={o.id} className={cn("px-4 py-3", (o.status === "rejected" || o.status === "cancelled") && "text-muted")}>
                       <div className="flex items-center gap-2">
                         <button type="button" onClick={() => setDrawer(o.id)} className="text-small font-semibold tabular underline-offset-4 hover-fine:underline">
                           #{o.orderNo}

@@ -4,13 +4,14 @@ import { TenantAdmin, type TenantRow } from "@/components/admin/tenant-admin";
 import { Skeleton } from "@/components/ui/skeleton";
 import { requirePlatformAdmin } from "@/lib/admin/auth";
 import { createAdminClient } from "@/lib/supabase/admin";
+import { requestNow } from "@/lib/time/server";
 
 export const metadata: Metadata = { title: "Platform admin" };
 
 async function Admin() {
   const me = await requirePlatformAdmin();
   const db = createAdminClient();
-  const since = new Date(Date.now() - 30 * 86_400_000).toISOString().slice(0, 10);
+  const since = new Date((await requestNow()) - 30 * 86_400_000).toISOString().slice(0, 10);
   const [{ data: tenants }, { data: outlets }, { data: metrics }, { data: audit }] = await Promise.all([
     db.from("tenants").select("id, name, slug, plan, status, gstin, created_at").order("created_at", { ascending: false }),
     db.from("outlets").select("id, tenant_id, mode"),

@@ -45,16 +45,18 @@ function Tile({ t, onOpen, style }: { t: TableTileData; onOpen: () => void; styl
       type="button"
       onClick={onOpen}
       style={style}
-      aria-label={`Table ${t.label}, ${meta.label}${t.session ? `, ${formatInr(t.session.due)} due` : ""}`}
       className={cn(
         "rise-in press group relative flex min-h-36 flex-col rounded-lg border bg-surface p-4 text-left shadow-sm",
         "transition-[transform,box-shadow,border-color] duration-[var(--motion-base)] ease-out hover-fine:-translate-y-0.5 hover-fine:shadow-md",
         t.status === "bill_requested" ? "border-warning/60" : t.status === "occupied" ? "border-info/40" : "border-border",
-        !t.active && "opacity-50",
+        !t.active && "border-dashed text-muted",
       )}
     >
       <div className="flex items-start justify-between gap-2">
-        <span className="font-display text-[1.75rem] leading-8 font-bold tracking-tight">{t.label}</span>
+        <span className="font-display text-[1.75rem] leading-8 font-bold tracking-tight">
+          <span className="sr-only">Table </span>
+          {t.label}
+        </span>
         {t.session?.openRequests ? (
           <span className="relative grid size-7 place-items-center rounded-full bg-warning/15 text-warning" aria-label={`${t.session.openRequests} open requests`}>
             <span className="ping-ring absolute inset-0 rounded-full bg-warning/30" aria-hidden />
