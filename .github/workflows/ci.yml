@@ -10,6 +10,19 @@ concurrency:
   cancel-in-progress: true
 
 jobs:
+  database:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: supabase/setup-cli@v1
+        with:
+          version: latest
+      - run: supabase db start
+      - name: Migrations apply cleanly from zero
+        run: supabase db reset
+      - name: RLS policy tests
+        run: supabase test db
+
   static-and-unit:
     runs-on: ubuntu-latest
     steps:
