@@ -1047,6 +1047,10 @@ export type Database = {
       [_ in never]: never;
     };
     Functions: {
+      close_session: {
+        Args: { p_invoice_no: string; p_session: string; p_totals: Json };
+        Returns: string;
+      };
       new_qr_token: { Args: Record<PropertyKey, never>; Returns: string };
       next_invoice_no: { Args: { p_tenant: string; p_timezone: string }; Returns: string };
       onboard_tenant: {

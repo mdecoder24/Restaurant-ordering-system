@@ -78,3 +78,30 @@ export function computeBill(lines: readonly BillLineInput[], config: BillConfig)
 
   return { lines: billLines, subtotal, serviceCharge, cgst, sgst, tax, rounding: total - raw, total };
 }
+
+export type StoredOrderTotals = { subtotal: number; serviceCharge: number; tax: number; rounding: number; total: number };
+export type InvoiceTotals = StoredOrderTotals & { cgst: number; sgst: number; orders: number };
+
+/**
+ * A session's invoice is the sum of its orders' stored computeBill results, split into
+ * CGST/SGST per order exactly as computeBill does, so invoice totals always equal what the
+ * guest was charged order by order.
+ */
+export function sumOrderTotals(orders: readonly StoredOrderTotals[]): InvoiceTotals {
+  return orders.reduce<InvoiceTotals>(
+    (acc, o) => {
+      const cgst = Math.floor(o.tax / 2);
+      return {
+        subtotal: acc.subtotal + o.subtotal,
+        serviceCharge: acc.serviceCharge + o.serviceCharge,
+        tax: acc.tax + o.tax,
+        cgst: acc.cgst + cgst,
+        sgst: acc.sgst + (o.tax - cgst),
+        rounding: acc.rounding + o.rounding,
+        total: acc.total + o.total,
+        orders: acc.orders + 1,
+      };
+    },
+    { subtotal: 0, serviceCharge: 0, tax: 0, cgst: 0, sgst: 0, rounding: 0, total: 0, orders: 0 },
+  );
+}

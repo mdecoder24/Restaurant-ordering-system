@@ -1,5 +1,5 @@
 import { describe, expect, it } from "vitest";
-import { computeBill, roundDiv, unitPrice } from "./bill";
+import { computeBill, roundDiv, sumOrderTotals, unitPrice } from "./bill";
 
 const exclusive = { defaultTaxRateBps: 500, pricesIncludeTax: false, serviceChargeBps: 0 };
 
@@ -77,5 +77,21 @@ describe("computeBill", () => {
   it("rejects an invalid config", () => {
     expect(() => computeBill([], { ...exclusive, serviceChargeBps: -1 })).toThrow(RangeError);
     expect(() => computeBill([], { ...exclusive, defaultTaxRateBps: 0.5 })).toThrow(RangeError);
+  });
+});
+
+describe("sumOrderTotals", () => {
+  it("adds order bills and matches computeBill's tax split", () => {
+    const a = computeBill([{ unitPrice: 2_020, qty: 1, taxRateBps: 500 }], exclusive);
+    const b = computeBill([{ unitPrice: 10_000, qty: 2, taxRateBps: 1_800 }], { ...exclusive, serviceChargeBps: 500 });
+    const inv = sumOrderTotals([a, b]);
+    expect(inv.total).toBe(a.total + b.total);
+    expect(inv.cgst).toBe(a.cgst + b.cgst);
+    expect(inv.sgst).toBe(a.sgst + b.sgst);
+    expect(inv.subtotal + inv.serviceCharge + inv.tax + inv.rounding).toBe(inv.total);
+    expect(inv.orders).toBe(2);
+  });
+  it("is zero for no orders", () => {
+    expect(sumOrderTotals([]).total).toBe(0);
   });
 });
