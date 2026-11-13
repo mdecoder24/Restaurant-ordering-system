@@ -1,9 +1,13 @@
+import { tmpdir } from "node:os";
+import { join } from "node:path";
 import { defineConfig, devices } from "@playwright/test";
 
 const port = Number(process.env.E2E_PORT ?? 3100);
 
 export default defineConfig({
   testDir: "./tests/e2e",
+  // Outside the app: next dev watches the project and would hot-reload on every trace write.
+  outputDir: join(tmpdir(), "krudex-e2e-results"),
   fullyParallel: true,
   forbidOnly: Boolean(process.env.CI),
   retries: process.env.CI ? 1 : 0,

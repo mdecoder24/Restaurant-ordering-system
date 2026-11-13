@@ -102,3 +102,53 @@ export async function loadOutletOrders(outletId: string, statuses: OrderStatus[]
   }
   return rows.map((r) => toStaffOrder(r, paid));
 }
+
+export type BoardGroup = {
+  sessionId: string;
+  tableId: string | null;
+  label: string;
+  tokenNo: number | null;
+  openedAt: string;
+  billed: number;
+  paid: number;
+  requests: ("call_waiter" | "request_bill")[];
+  orders: StaffOrder[];
+};
+
+/** Live board (D-01): every open session with all its orders and running total. */
+export async function loadBoard(outletId: string): Promise<BoardGroup[]> {
+  const supabase = await createClient();
+  const { data: sessions } = await supabase
+    .from("table_sessions")
+    .select("id, table_id, token_no, opened_at, tables(label)")
+    .eq("outlet_id", outletId)
+    .eq("status", "open")
+    .order("opened_at");
+  const ids = (sessions ?? []).map((s) => s.id);
+  if (!ids.length) return [];
+  const [{ data: rows }, { data: pays }, { data: reqs }] = await Promise.all([
+    supabase.from("orders").select(select).in("session_id", ids).order("placed_at"),
+    supabase.from("payments").select("session_id, amount, refunded_amount, status").in("session_id", ids),
+    supabase.from("service_requests").select("session_id, type").in("session_id", ids).eq("status", "open"),
+  ]);
+  const paidBy = new Map<string, number>();
+  for (const p of pays ?? []) if (p.status === "captured" || p.status === "refunded") paidBy.set(p.session_id, (paidBy.get(p.session_id) ?? 0) + p.amount - p.refunded_amount);
+  const paidSessions = new Set([...paidBy.keys()]);
+  const orders = ((rows ?? []) as unknown as Row[]).map((r) => toStaffOrder(r, paidSessions));
+  return (sessions ?? [])
+    .map((s) => {
+      const os = orders.filter((o) => o.sessionId === s.id);
+      return {
+        sessionId: s.id,
+        tableId: s.table_id,
+        label: s.tables?.label ? `Table ${s.tables.label}` : `Token ${s.token_no ?? "–"}`,
+        tokenNo: s.token_no,
+        openedAt: s.opened_at,
+        billed: os.filter((o) => o.status !== "rejected" && o.status !== "cancelled").reduce((sum, o) => sum + o.total, 0),
+        paid: paidBy.get(s.id) ?? 0,
+        requests: (reqs ?? []).filter((r) => r.session_id === s.id).map((r) => r.type),
+        orders: os,
+      };
+    })
+    .filter((g) => g.orders.length > 0 || g.requests.length > 0);
+}
