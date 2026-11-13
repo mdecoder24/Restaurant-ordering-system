@@ -1,6 +1,7 @@
 import Link from "next/link";
 import { LiveTicketDemo } from "@/components/brand/live-ticket-demo";
 import { Logo } from "@/components/brand/logo";
+import { Tilt } from "@/components/motion/tilt";
 import { Toaster } from "@/components/ui/toaster";
 
 /** Staff auth: form on the left, a calm brand panel on the right from lg up. */
@@ -20,7 +21,9 @@ export default function AuthLayout({ children }: { children: React.ReactNode }) 
         <div className="dot-grid absolute inset-0 -z-10" />
         <div className="glow-drift absolute -top-24 -right-24 -z-10 size-[30rem] rounded-full bg-[radial-gradient(closest-side,var(--glow-primary),transparent)]" />
         <div className="rise-in flex flex-col items-center gap-8 px-10">
-          <LiveTicketDemo />
+          <Tilt max={10} glare innerClassName="rounded-lg">
+            <LiveTicketDemo />
+          </Tilt>
           <p className="max-w-xs text-center text-small text-muted">
             Orders from every table, straight to your kitchen. Live.
           </p>

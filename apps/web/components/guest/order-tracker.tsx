@@ -149,7 +149,12 @@ export function OrderTracker({
       </div>
 
       {canteen && !ended ? (
-        <section aria-label="Your token" className="rise-in mt-6 rounded-lg border border-border bg-surface p-6 text-center shadow-md">
+        <section
+          aria-label="Your token"
+          // Ready is the moment guests wait for: the token card flips up in 3D (rare, so it can delight).
+          key={order.status === "ready" ? "ready" : "waiting"}
+          className={cn(order.status === "ready" ? "flip-in" : "rise-in", "mt-6 rounded-lg border border-border bg-surface p-6 text-center shadow-md")}
+        >
           <p className="text-small font-semibold tracking-wide text-muted uppercase">Your token</p>
           <p className={cn("font-display text-[4.5rem] leading-none font-extrabold tracking-tight tabular", order.status === "ready" ? "text-success" : "text-text")}>
             {tokenNo ?? order.order_no}
@@ -158,7 +163,7 @@ export function OrderTracker({
         </section>
       ) : null}
 
-      <div aria-live="polite" className="rise-in mt-6" key={order.status}>
+      <div aria-live="polite" className={cn(order.status === "ready" ? "flip-in" : "rise-in", "mt-6")} key={order.status}>
         <h1 className={cn("swap-in font-display text-h1 font-bold tracking-tight text-balance", ended && "text-danger")}>{h.title}</h1>
         {h.body ? <p className="mt-1 text-body text-muted">{h.body}</p> : null}
       </div>

@@ -5,7 +5,6 @@ import {
   ChefHat,
   KeyRound,
   Printer,
-  QrCode,
   ReceiptText,
   Ticket,
   UtensilsCrossed,
@@ -14,10 +13,12 @@ import {
 } from "lucide-react";
 import Link from "next/link";
 import type { CSSProperties } from "react";
-import { LiveTicketDemo } from "@/components/brand/live-ticket-demo";
 import { Logo } from "@/components/brand/logo";
+import { HeroScene } from "@/components/marketing/hero-scene";
 import { SiteHeader } from "@/components/marketing/site-header";
+import { QrTent } from "@/components/marketing/qr-tent";
 import { StationVisual, type Station } from "@/components/marketing/station-visual";
+import { Tilt } from "@/components/motion/tilt";
 import { Button } from "@/components/ui/button";
 import { brand } from "@/lib/brand";
 import { previewEnabled } from "@/lib/env";
@@ -124,19 +125,8 @@ export default function Home() {
             ) : null}
           </div>
 
-          <div className="rise-in flex justify-center lg:justify-end" style={at(3)}>
-            <div className="relative">
-              {/* Stacked back cards give the ticket physical depth. */}
-              <div
-                aria-hidden
-                className="absolute inset-x-6 -bottom-3 h-full rounded-lg border border-border bg-surface/70 shadow-sm"
-              />
-              <div
-                aria-hidden
-                className="absolute inset-x-3 -bottom-1.5 h-full rounded-lg border border-border bg-surface/85 shadow-sm"
-              />
-              <LiveTicketDemo className="relative" />
-            </div>
+          <div className="flex justify-center lg:justify-end">
+            <HeroScene />
           </div>
         </section>
 
@@ -155,7 +145,7 @@ export default function Home() {
                 className="reveal-line absolute top-6 right-[16%] left-[16%] hidden h-px origin-left bg-border-strong md:block"
               />
               {steps.map((s, i) => (
-                <li key={s.title} className="reveal relative flex flex-col items-start md:items-center md:text-center" style={at(i)}>
+                <li key={s.title} className="reveal-3d relative flex flex-col items-start md:items-center md:text-center" style={at(i)}>
                   <span className="relative grid size-12 place-items-center rounded-full border border-border-strong bg-surface text-primary shadow-sm">
                     <s.icon aria-hidden className="size-5" strokeWidth={2.25} />
                     <span className="absolute -top-1 -right-1 grid size-5 place-items-center rounded-full bg-primary text-[0.6875rem] font-bold text-primary-fg tabular">
@@ -181,19 +171,19 @@ export default function Home() {
             />
             <ul className="mt-12 grid gap-4 md:grid-cols-2">
               {stations.map((s, i) => (
-                <li
-                  key={s.id}
-                  className="reveal group overflow-hidden rounded-lg border border-border bg-surface shadow-sm transition-[box-shadow,transform] duration-[var(--motion-base)] ease-out hover-fine:-translate-y-0.5 hover-fine:shadow-md"
-                  style={at(i % 2)}
-                >
-                  <div className="border-b border-border bg-surface-2/70 dot-grid-soft">
-                    <StationVisual station={s.id} />
-                  </div>
-                  <div className="p-6">
-                    <p className="text-caption font-semibold tracking-wide text-primary uppercase">{s.eyebrow}</p>
-                    <h3 className="mt-1 font-display text-h2 font-bold tracking-tight">{s.title}</h3>
-                    <p className="mt-1.5 text-small text-muted text-pretty">{s.body}</p>
-                  </div>
+                <li key={s.id} className="reveal-3d" style={at(i % 2)}>
+                  <Tilt max={6} glare className="h-full" innerClassName="h-full rounded-lg">
+                    <div className="h-full overflow-hidden rounded-lg border border-border bg-surface shadow-sm transition-shadow duration-[var(--motion-base)] ease-out hover-fine:shadow-lg">
+                      <div className="dot-grid-soft border-b border-border bg-surface-2/70">
+                        <StationVisual station={s.id} />
+                      </div>
+                      <div className="p-6">
+                        <p className="text-caption font-semibold tracking-wide text-primary uppercase">{s.eyebrow}</p>
+                        <h3 className="mt-1 font-display text-h2 font-bold tracking-tight">{s.title}</h3>
+                        <p className="mt-1.5 text-small text-muted text-pretty">{s.body}</p>
+                      </div>
+                    </div>
+                  </Tilt>
                 </li>
               ))}
             </ul>
@@ -224,10 +214,16 @@ export default function Home() {
         <section aria-labelledby="cta-title" className="px-4 pb-20 sm:px-6 sm:pb-24">
           <div className="reveal relative isolate mx-auto max-w-6xl overflow-hidden rounded-lg bg-primary px-6 py-14 text-center text-primary-fg shadow-lg sm:px-12 sm:py-16">
             <div aria-hidden className="pointer-events-none absolute inset-0 -z-10">
+              <div className="cta-floor absolute inset-x-0 top-1/2 bottom-0">
+                <div className="cta-floor-plane">
+                  <span />
+                </div>
+              </div>
               <div className="glow-drift absolute -top-24 -left-16 size-80 rounded-full bg-[radial-gradient(closest-side,var(--glow-secondary),transparent)]" />
-              <div className="cta-grid absolute inset-0" />
             </div>
-            <QrCode aria-hidden className="mx-auto size-10 opacity-90" strokeWidth={1.75} />
+            <div className="mx-auto mb-8 w-fit [perspective:900px] [zoom:0.7]">
+              <QrTent label="Your table" />
+            </div>
             <h2 id="cta-title" className="mt-4 font-display text-h1 font-extrabold tracking-tight text-balance sm:text-[2.25rem] sm:leading-tight">
               Your first table QR is ten minutes away
             </h2>
