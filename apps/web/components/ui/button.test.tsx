@@ -20,7 +20,10 @@ describe("Button", () => {
     const button = screen.getByRole("button");
     expect(button).toHaveAttribute("aria-busy", "true");
     expect(button).toBeDisabled();
-    expect(screen.getByText("Pay ₹450")).toHaveClass("invisible");
+    // Label stays in the DOM for width but is faded out and hidden from assistive tech.
+    const label = screen.getByText("Pay ₹450");
+    expect(label).toHaveClass("opacity-0");
+    expect(label).toHaveAttribute("aria-hidden", "true");
     expect(screen.getByRole("img", { name: "Loading" })).toBeInTheDocument();
     await userEvent.click(button);
     expect(onClick).not.toHaveBeenCalled();

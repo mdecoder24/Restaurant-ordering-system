@@ -16,13 +16,16 @@ export const buttonVariants = cva(
   {
     variants: {
       variant: {
-        primary:
-          "bg-primary text-primary-fg shadow-sm hover-fine:bg-primary-hover data-[loading=true]:bg-primary-hover",
+        primary: [
+          "bg-primary text-primary-fg shadow-[var(--shadow-sm),var(--highlight-inset)]",
+          "hover-fine:bg-primary-hover hover-fine:shadow-[var(--shadow-md),var(--highlight-inset)]",
+          "active:shadow-[var(--shadow-sm)] data-[loading=true]:bg-primary-hover",
+        ],
         secondary:
           "border border-border-strong bg-surface text-text shadow-sm hover-fine:bg-surface-2 active:bg-surface-3",
         ghost: "bg-transparent text-text hover-fine:bg-surface-2 active:bg-surface-3",
         danger:
-          "bg-danger text-on-solid shadow-sm hover-fine:brightness-110 active:brightness-95",
+          "bg-danger text-on-solid shadow-[var(--shadow-sm),var(--highlight-inset)] hover-fine:brightness-110 active:brightness-95",
         soft: "bg-primary-soft text-primary hover-fine:brightness-[0.97] active:brightness-95",
       },
       size: {
@@ -73,16 +76,19 @@ export function Button({
       ) : (
         <>
           <span
+            // Blur crossfade: label and spinner read as one morph, not two objects swapping.
             className={cn(
               "inline-flex items-center justify-center gap-2",
+              "transition-[opacity,filter,transform] duration-[var(--motion-base)] ease-out",
               block && "w-full",
-              loading && "invisible",
+              loading && "scale-[0.97] opacity-0 blur-[3px]",
             )}
+            aria-hidden={loading || undefined}
           >
             {children}
           </span>
           {loading ? (
-            <span className="absolute inset-0 grid place-items-center">
+            <span className="swap-in absolute inset-0 grid place-items-center">
               <Spinner label="Loading" />
             </span>
           ) : null}

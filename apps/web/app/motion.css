@@ -104,6 +104,100 @@
   animation: shimmer 1.4s linear infinite;
 }
 
+/*
+ * Entrance choreography for first-paint and rarely seen surfaces (landing, empty states).
+ * Set `--i` on each child for a 60ms stagger. Never used on repeated in-app UI.
+ */
+@keyframes rise-in {
+  from {
+    opacity: 0;
+    transform: translateY(10px);
+    filter: blur(4px);
+  }
+}
+.rise-in {
+  animation: rise-in 560ms var(--ease-out) both;
+  animation-delay: calc(var(--i, 0) * 60ms + 40ms);
+}
+
+/* Slow ambient drift for hero glows. Decorative, so it stops entirely under reduced motion. */
+@keyframes glow-drift {
+  0%,
+  100% {
+    transform: translate3d(0, 0, 0) scale(1);
+  }
+  50% {
+    transform: translate3d(4%, -3%, 0) scale(1.08);
+  }
+}
+.glow-drift {
+  animation: glow-drift 14s var(--ease-in-out) infinite;
+}
+
+/* Live dot: a soft ring that radiates from a status indicator. */
+@keyframes ping-ring {
+  from {
+    opacity: 0.55;
+    transform: scale(1);
+  }
+  to {
+    opacity: 0;
+    transform: scale(2.4);
+  }
+}
+.ping-ring {
+  animation: ping-ring 1.6s var(--ease-out) infinite;
+}
+
+/* State swap (status badge, labels): blur bridges the two states so the eye sees one change. */
+@keyframes swap-in {
+  from {
+    opacity: 0;
+    transform: translateY(4px) scale(0.98);
+    filter: blur(3px);
+  }
+}
+.swap-in {
+  animation: swap-in 260ms var(--ease-out);
+}
+
+/* Sweeping highlight across a hero CTA on hover; off for touch and reduced motion. */
+.sheen {
+  position: relative;
+  overflow: hidden;
+  isolation: isolate;
+}
+.sheen::after {
+  content: "";
+  position: absolute;
+  inset: 0;
+  z-index: -1;
+  background: linear-gradient(
+    105deg,
+    transparent 35%,
+    color-mix(in oklab, var(--color-primary-fg) 22%, transparent) 50%,
+    transparent 65%
+  );
+  transform: translateX(-100%);
+  pointer-events: none;
+}
+@media (hover: hover) and (pointer: fine) {
+  .sheen:hover::after {
+    transform: translateX(100%);
+    transition: transform 700ms var(--ease-out);
+  }
+}
+
+/* Faint dot grid that fades out towards the edges. */
+.dot-grid {
+  background-image: radial-gradient(
+    color-mix(in oklab, var(--color-text) 9%, transparent) 1px,
+    transparent 1px
+  );
+  background-size: 22px 22px;
+  mask-image: radial-gradient(ellipse 70% 60% at 50% 40%, black 30%, transparent 75%);
+}
+
 /* Reduced motion means gentler, not none: keep fades, drop movement and scale. */
 @media (prefers-reduced-motion: reduce) {
   .popover-motion[data-state="open"],
@@ -125,5 +219,16 @@
   }
   .skeleton-shimmer {
     animation: none;
+  }
+  .rise-in,
+  .swap-in {
+    animation-name: fade-in;
+  }
+  .glow-drift,
+  .ping-ring {
+    animation: none;
+  }
+  .sheen::after {
+    display: none;
   }
 }

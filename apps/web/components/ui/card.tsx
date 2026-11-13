@@ -1,10 +1,24 @@
 import type { ComponentProps } from "react";
 import { cn } from "@/lib/cn";
 
-export function Card({ className, ...props }: ComponentProps<"div">) {
+type CardProps = ComponentProps<"div"> & {
+  /** Lifts on pointer hover and presses on tap. Use only when the whole card is a target. */
+  interactive?: boolean;
+};
+
+export function Card({ className, interactive = false, ...props }: CardProps) {
   return (
     <div
-      className={cn("rounded-md border border-border bg-surface shadow-sm", className)}
+      data-interactive={interactive || undefined}
+      className={cn(
+        "rounded-md border border-border bg-surface shadow-sm",
+        interactive && [
+          "transition-[transform,box-shadow,border-color] duration-[var(--motion-base)] ease-out",
+          "hover-fine:-translate-y-0.5 hover-fine:border-border-strong hover-fine:shadow-md",
+          "active:translate-y-0 active:scale-[0.99] active:duration-[var(--motion-fast)]",
+        ],
+        className,
+      )}
       {...props}
     />
   );

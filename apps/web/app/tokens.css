@@ -48,10 +48,19 @@
   --radius-pill: 999px;
 
   /* Elevation */
-  --shadow-sm: 0 1px 2px rgb(0 0 0 / 0.06);
-  --shadow-md: 0 4px 12px rgb(0 0 0 / 0.08);
-  --shadow-lg: 0 12px 32px rgb(0 0 0 / 0.12), 0 2px 6px rgb(0 0 0 / 0.06);
+  /* Layered: a tight contact shadow keeps edges crisp, a wide soft one gives lift. */
+  --shadow-sm: 0 1px 2px rgb(28 27 25 / 0.06), 0 1px 1px rgb(28 27 25 / 0.03);
+  --shadow-md: 0 1px 2px rgb(28 27 25 / 0.05), 0 4px 8px -2px rgb(28 27 25 / 0.06),
+    0 12px 24px -8px rgb(28 27 25 / 0.1);
+  --shadow-lg: 0 1px 3px rgb(28 27 25 / 0.06), 0 8px 16px -4px rgb(28 27 25 / 0.08),
+    0 24px 48px -12px rgb(28 27 25 / 0.18);
   --shadow-sheet: 0 -8px 24px rgb(0 0 0 / 0.12);
+  /* Top-edge light on solid buttons and dark surfaces: reads as a physical bevel. */
+  --highlight-inset: inset 0 1px 0 rgb(255 255 255 / 0.16);
+  --highlight-surface: inset 0 1px 0 rgb(255 255 255 / 0);
+  /* Ambient brand glow for hero backdrops. */
+  --glow-primary: rgb(194 65 12 / 0.16);
+  --glow-secondary: rgb(240 180 41 / 0.14);
 
   /* Motion */
   --motion-fast: 120ms;
@@ -150,10 +159,14 @@
   --status-served: #a7a39a;
   --status-cancelled: #ff6b6b;
 
-  --shadow-sm: 0 1px 2px rgb(0 0 0 / 0.4);
-  --shadow-md: 0 4px 12px rgb(0 0 0 / 0.4);
-  --shadow-lg: 0 12px 32px rgb(0 0 0 / 0.5);
+  --shadow-sm: 0 1px 2px rgb(0 0 0 / 0.4), inset 0 1px 0 rgb(255 255 255 / 0.04);
+  --shadow-md: 0 4px 12px rgb(0 0 0 / 0.4), inset 0 1px 0 rgb(255 255 255 / 0.05);
+  --shadow-lg: 0 12px 32px rgb(0 0 0 / 0.5), inset 0 1px 0 rgb(255 255 255 / 0.06);
   --shadow-sheet: 0 -8px 24px rgb(0 0 0 / 0.5);
+  --highlight-inset: inset 0 1px 0 rgb(255 255 255 / 0.22);
+  --highlight-surface: inset 0 1px 0 rgb(255 255 255 / 0.05);
+  --glow-primary: rgb(255 122 82 / 0.14);
+  --glow-secondary: rgb(240 180 41 / 0.08);
 }
 
 @media (prefers-reduced-motion: reduce) {
