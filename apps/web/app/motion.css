@@ -282,6 +282,116 @@
   mask-image: radial-gradient(ellipse 80% 90% at 20% 0%, black 20%, transparent 70%);
 }
 
+/*
+ * 3D hero scene. Each layer sits at its own depth (--z) and bobs with the independent
+ * `translate` property, so the float composes with the static 3D transform instead of
+ * replacing it. Layers float on different phases (inline animation-delay).
+ */
+.scene-layer {
+  transform-style: preserve-3d;
+  transform: translateZ(var(--z, 0)) rotateX(var(--rx, 0)) rotateY(var(--ry, 0));
+  animation: layer-float 6s var(--ease-in-out) infinite;
+}
+@keyframes layer-float {
+  0%,
+  100% {
+    translate: 0 0;
+  }
+  50% {
+    translate: 0 -10px;
+  }
+}
+/* Scene enters by swinging up from a steeper angle, like a card being set on a table. */
+@keyframes scene-enter {
+  from {
+    opacity: 0;
+    transform: perspective(1200px) rotateX(22deg) translateY(40px) scale(0.94);
+  }
+}
+.scene-enter {
+  animation: scene-enter 1100ms var(--ease-out) 120ms both;
+}
+
+/* Table tent sways so its folded back panel shows: the cue that it is a real 3D object. */
+@keyframes tent-sway {
+  0%,
+  100% {
+    transform: rotateY(-22deg);
+  }
+  50% {
+    transform: rotateY(22deg);
+  }
+}
+.tent-sway {
+  animation: tent-sway 7s var(--ease-in-out) infinite;
+}
+
+/* 3D variant of `.reveal`: content tips up into place as it scrolls in. */
+@keyframes reveal-tip {
+  from {
+    opacity: 0;
+    transform: perspective(1000px) rotateX(24deg) translateY(48px) scale(0.97);
+  }
+}
+@supports (animation-timeline: view()) {
+  @media (prefers-reduced-motion: no-preference) {
+    .reveal-3d {
+      transform-origin: 50% 100%;
+      animation: reveal-tip linear both;
+      animation-timing-function: var(--ease-out);
+      animation-timeline: view();
+      animation-range: entry calc(var(--i, 0) * 7%) entry calc(65% + var(--i, 0) * 7%);
+    }
+  }
+}
+
+/* Perspective floor grid that glides towards the viewer (closing CTA). Transform-only loop. */
+.cta-floor {
+  perspective: 420px;
+  perspective-origin: 50% 0%;
+}
+.cta-floor-plane {
+  position: absolute;
+  left: -50%;
+  right: -50%;
+  top: 0;
+  height: 200%;
+  overflow: hidden;
+  transform-origin: 50% 0%;
+  transform: rotateX(62deg);
+  mask-image: linear-gradient(to bottom, transparent 0%, black 30%, black 55%, transparent 100%);
+}
+/* The grid moves inside the tilted plane, so it glides along the floor, not up the screen. */
+.cta-floor-plane > span {
+  position: absolute;
+  inset: -48px 0 0 0;
+  background-image:
+    linear-gradient(color-mix(in oklab, var(--color-primary-fg) 22%, transparent) 1px, transparent 1px),
+    linear-gradient(90deg, color-mix(in oklab, var(--color-primary-fg) 22%, transparent) 1px, transparent 1px);
+  background-size: 48px 48px;
+  animation: floor-glide 2.4s linear infinite;
+}
+@keyframes floor-glide {
+  to {
+    transform: translateY(48px);
+  }
+}
+
+/* Rare, celebratory state change (order ready): the card flips up into place. */
+@keyframes flip-in {
+  from {
+    opacity: 0;
+    transform: perspective(800px) rotateX(-80deg);
+  }
+  60% {
+    opacity: 1;
+  }
+}
+.flip-in {
+  transform-origin: 50% 0%;
+  animation: flip-in 640ms var(--ease-out) both;
+}
+
 /* KDS new-ticket flash (K-03): a brief glow ring, paired with the chime. */
 @keyframes kds-flash {
   0%,
@@ -326,7 +436,18 @@
   .glow-drift,
   .ping-ring,
   .station-bob,
-  .station-ticket {
+  .station-ticket,
+  .scene-layer,
+  .tent-sway,
+  .cta-floor-plane > span {
+    animation: none;
+  }
+  .scene-enter,
+  .flip-in {
+    animation-name: fade-in;
+  }
+  .glow-drift,
+  .ping-ring {
     animation: none;
   }
   .sheen::after {
