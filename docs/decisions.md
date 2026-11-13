@@ -19,3 +19,10 @@ Format: date · decision · reason. Per AGENTS.md §2, unspecified choices are r
 - **Raw-colour guard**: `scripts/check-raw-hex.mjs` (part of `pnpm lint`) fails on hex or arbitrary colour utilities outside `tokens.css` and `lib/theme-colors.ts` (viewport meta needs literals).
 - **Local e2e uses installed Chrome** (`channel: "chrome"`); CI installs Playwright Chromium.
 - **`supabase` CLI as a root devDependency** (installed via npm before T01 started; moved under pnpm). Used from T03.
+
+## 2026-11-13 — UI polish pass (motion and depth)
+
+- **Layered shadows**: `--shadow-sm/md/lg` now stack a tight contact shadow with a soft wide one; dark theme adds a 1px top inset highlight. New tokens `--highlight-inset`, `--highlight-surface`, `--glow-primary`, `--glow-secondary`.
+- **Motion utilities** in `app/motion.css`: `rise-in` (staggered entrance via `--i`, landing/rare surfaces only), `swap-in` (blur crossfade for state swaps), `glow-drift`, `ping-ring`, `sheen`, `dot-grid`. All fall back to fades or nothing under reduced motion.
+- **Primitives**: primary/danger buttons get a bevel highlight; loading state blur-crossfades label to spinner; `Card interactive` lifts on pointer hover; switch thumb stretches on press; tabs use one sliding indicator (falls back to per-trigger background before measuring / without JS).
+- **Landing illustration**: `components/brand/live-ticket-demo.tsx` loops an example ticket through the order lifecycle. It is marketing illustration, visibly labelled "Example", not order data, so rule 11 does not apply. No new dependencies.

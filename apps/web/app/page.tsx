@@ -63,12 +63,14 @@ export default function Home() {
 
           <ul className="mt-2 grid w-full gap-4 sm:grid-cols-3">
             {features.map((f, i) => (
-              <li key={f.title} className="rise-in" style={at(4 + i)}>
-                <span className="grid size-9 place-items-center rounded-md bg-primary-soft text-primary">
+              <li key={f.title} className="rise-in flex gap-3 sm:block" style={at(4 + i)}>
+                <span className="grid size-9 shrink-0 place-items-center rounded-md bg-primary-soft text-primary">
                   <f.icon aria-hidden className="size-[18px]" strokeWidth={2.25} />
                 </span>
-                <p className="mt-3 text-small font-semibold">{f.title}</p>
-                <p className="mt-0.5 text-small text-muted">{f.body}</p>
+                <div>
+                  <p className="text-small font-semibold sm:mt-3">{f.title}</p>
+                  <p className="mt-0.5 text-small text-muted">{f.body}</p>
+                </div>
               </li>
             ))}
           </ul>
