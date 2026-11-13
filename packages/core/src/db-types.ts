@@ -840,6 +840,61 @@ export type Database = {
           },
         ];
       };
+      refunds: {
+        Row: {
+          amount: number;
+          created_at: string;
+          created_by: string | null;
+          id: string;
+          payment_id: string;
+          provider_refund_id: string | null;
+          reason: string | null;
+          status: string;
+          tenant_id: string;
+          updated_at: string;
+        };
+        ComputedFields: never;
+        Insert: {
+          amount: number;
+          created_at?: string;
+          created_by?: string | null;
+          id?: string;
+          payment_id: string;
+          provider_refund_id?: string | null;
+          reason?: string | null;
+          status?: string;
+          tenant_id: string;
+          updated_at?: string;
+        };
+        Update: {
+          amount?: number;
+          created_at?: string;
+          created_by?: string | null;
+          id?: string;
+          payment_id?: string;
+          provider_refund_id?: string | null;
+          reason?: string | null;
+          status?: string;
+          tenant_id?: string;
+          updated_at?: string;
+        };
+        Relationships: [
+          {
+            foreignKeyName: "refunds_created_by_fkey";
+            columns: ["created_by"];
+            isOneToOne: false;
+            referencedRelation: "members";
+            referencedColumns: ["id"];
+          },
+          {
+            foreignKeyName: "refunds_payment_id_fkey";
+            columns: ["payment_id"];
+            isOneToOne: false;
+            referencedRelation: "payments";
+            referencedColumns: ["id"];
+          },
+        ];
+      };
       service_requests: {
         Row: {
           created_at: string;
@@ -1042,11 +1097,34 @@ export type Database = {
         };
         Relationships: [];
       };
+      webhook_events: {
+        Row: {
+          event: string;
+          id: string;
+          provider: string;
+          received_at: string;
+        };
+        ComputedFields: never;
+        Insert: {
+          event: string;
+          id: string;
+          provider: string;
+          received_at?: string;
+        };
+        Update: {
+          event?: string;
+          id?: string;
+          provider?: string;
+          received_at?: string;
+        };
+        Relationships: [];
+      };
     };
     Views: {
       [_ in never]: never;
     };
     Functions: {
+      apply_refund: { Args: { p_refund: string }; Returns: undefined };
       close_session: {
         Args: { p_invoice_no: string; p_session: string; p_totals: Json };
         Returns: string;

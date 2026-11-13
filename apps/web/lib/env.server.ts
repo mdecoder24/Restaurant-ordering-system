@@ -12,6 +12,8 @@ const serverSchema = z.object({
   RAZORPAY_KEY_SECRET: z.string().min(1).optional(),
   RAZORPAY_WEBHOOK_SECRET: z.string().min(1).optional(),
   GUEST_SESSION_SECRET: z.string().min(32).optional(),
+  /** "true" enables the local test gateway outside development (never with real money). */
+  PAYMENTS_FAKE: z.enum(["true", "false"]).optional(),
   /** Signs short-lived guest realtime tokens (Architecture §4). Project JWT secret. */
   SUPABASE_JWT_SECRET: z.string().min(32).optional(),
 });

@@ -40,3 +40,15 @@ Format: date · decision · reason. Per AGENTS.md §2, unspecified choices are r
 - **GST maths** (`computeBill`): per-line tax rounded half up; service charge taxed at the outlet default rate; CGST/SGST split equally with the odd paisa on SGST; total rounded to the nearest rupee with an explicit `rounding` line. Intra-state supply assumed (no IGST).
 - **State machine**: Architecture §6 as written; owners and managers may also drive kitchen steps because Flow §13 gives them the kitchen screen.
 - **Order numbers** reset daily per outlet (outlet timezone); invoice numbers are `<FY>/<6 digits>` per tenant, FY starting 1 April.
+
+## 2026-11-13 · T07–T16
+
+- **Dashboard mutations are server actions** (`lib/*/actions.ts`) rather than the CRUD route handlers listed in Architecture §7. Same contract: Zod validation, role check via the DAL, RLS-scoped writes, `{ ok, error }` results. Guest endpoints, webhooks, uploads, PDFs and the KDS/board status API stay route handlers.
+- **New dependencies**: `qrcode` (QR SVG/PNG) and `pdf-lib` (table tents, GST invoices). Both MIT, pure JS. No Zustand: the cart is a 100-line `useSyncExternalStore` store over localStorage.
+- **Guest session proof** is an HMAC-signed httpOnly cookie per outlet (`kx_g_<outlet>`), not a stored secret, so a second guest at the same table can join the open session (Flow §3). `table_sessions.secret_hash` is kept for a future per-guest secret.
+- **Sessions open on the first order**, not on scan, so tables never show empty "occupied" bills.
+- **KDS undo** delays sending a status change by 5 s instead of adding reverse transitions to the state machine (rules unchanged).
+- **Invoices** are the sum of each order's stored `computeBill` result (`sumOrderTotals`), so invoice totals always equal what was charged; PDFs are rendered on demand, not stored. Standard PDF fonts print "Rs." because they cannot encode "₹".
+- **Payments**: gateway interface with Razorpay (REST + HMAC verification) and a **local test gateway** used only when Razorpay keys are absent and not in production (`PAYMENTS_FAKE=true` overrides). The test gateway settles through the same `applyGatewayEvent` code as real webhooks. Webhooks are deduplicated by event id in `webhook_events`; state only moves forward. Manual (cash/terminal) payments are recorded as `provider = 'manual'`.
+- **Canteen prepaid**: orders stay `placed` (hidden from the KDS) until capture, then move to `accepted` as `system`.
+- **SMS/WhatsApp receipts (G-11 optional)** not built: no messaging provider or credentials. Receipts are on screen and downloadable.
