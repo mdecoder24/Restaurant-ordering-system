@@ -1,0 +1,20 @@
+export type MenuAddon = { id: string; name: string; price: number; available: boolean };
+export type MenuAddonGroup = { id: string; name: string; min_select: number; max_select: number; addons: MenuAddon[] };
+export type MenuVariant = { id: string; name: string; price_delta: number; is_default: boolean };
+export type MenuItem = {
+  id: string;
+  category_id: string;
+  name: string;
+  description: string | null;
+  price: number;
+  image_path: string | null;
+  is_veg: boolean;
+  dietary_tags: string[];
+  available: boolean;
+  sort_order: number;
+  tax_rate_bps: number | null;
+  prep_station: string | null;
+  variants: MenuVariant[];
+  addon_groups: MenuAddonGroup[];
+};
+export type MenuCategory = { id: string; name: string; active: boolean; sort_order: number };

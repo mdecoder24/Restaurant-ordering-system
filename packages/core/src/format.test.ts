@@ -1,5 +1,5 @@
 import { describe, expect, it } from "vitest";
-import { formatDuration, formatInr } from "./format";
+import { formatDuration, formatInr, paiseToInput, parseInr } from "./format";
 
 describe("formatInr", () => {
   it.each([
@@ -41,5 +41,25 @@ describe("formatDuration", () => {
 
   it("clamps negative durations to zero", () => {
     expect(formatDuration(-10)).toBe("0:00");
+  });
+});
+
+describe("parseInr / paiseToInput", () => {
+  it.each([
+    ["120", 12_000],
+    ["120.5", 12_050],
+    ["120.05", 12_005],
+    ["₹ 1,250.00", 125_000],
+    ["0", 0],
+  ])("parses %s", (input, paise) => {
+    expect(parseInr(input)).toBe(paise);
+  });
+  it.each(["", "abc", "1.234", "-5", "1e3", "12."])("rejects %s", (input) => {
+    expect(parseInr(input)).toBeNull();
+  });
+  it("round-trips", () => {
+    expect(paiseToInput(12_050)).toBe("120.50");
+    expect(paiseToInput(12_000)).toBe("120");
+    expect(parseInr(paiseToInput(99_999))).toBe(99_999);
   });
 });

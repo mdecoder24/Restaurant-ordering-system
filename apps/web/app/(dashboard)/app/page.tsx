@@ -2,7 +2,6 @@ import { formatInr } from "@krudex/core/format";
 import { ArrowRight, CircleCheck, CircleDashed, ClipboardList, IndianRupee, Receipt, Timer, TriangleAlert } from "lucide-react";
 import type { Metadata } from "next";
 import Link from "next/link";
-import { connection } from "next/server";
 import { Suspense, type CSSProperties } from "react";
 import { KpiCard } from "@/components/dashboard/kpi-card";
 import { PageBody, PageHeader } from "@/components/dashboard/shell";
@@ -12,6 +11,7 @@ import { requireRole } from "@/lib/auth/dal";
 import { cn } from "@/lib/cn";
 import { createClient } from "@/lib/supabase/server";
 import { startOfLocalDay } from "@/lib/time";
+import { requestNow } from "@/lib/time/server";
 
 export const metadata: Metadata = { title: "Home" };
 
@@ -38,8 +38,7 @@ async function Home() {
   const revenue = valid.reduce((s, o) => s + o.total, 0);
   const aov = valid.length ? Math.round(revenue / valid.length) : 0;
   const overdueMs = (outlet?.ticket_overdue_minutes ?? 20) * 60_000;
-  await connection();
-  const now = Date.now();
+  const now = await requestNow();
   const stuck = (live.data ?? []).filter(
     (o) => (o.status === "placed" && now - Date.parse(o.placed_at) > 5 * 60_000) || now - Date.parse(o.placed_at) > overdueMs,
   );

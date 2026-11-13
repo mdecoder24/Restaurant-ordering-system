@@ -2,6 +2,7 @@ import "server-only";
 import type { Database } from "@krudex/core/db-types";
 import { cookies } from "next/headers";
 import { redirect } from "next/navigation";
+import { connection } from "next/server";
 import { cache } from "react";
 import { createClient } from "@/lib/supabase/server";
 
@@ -47,6 +48,8 @@ type Session =
   | ({ status: "ok" } & StaffContext);
 
 export const getSession = cache(async (): Promise<Session> => {
+  // Sessions are request-time data; Supabase checks token expiry against the clock.
+  await connection();
   const supabase = await createClient();
   const {
     data: { user },
